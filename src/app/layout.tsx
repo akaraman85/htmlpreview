@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "HTMLPreview",
   description: "Store HTML snippets via API and share them instantly with public URLs",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
