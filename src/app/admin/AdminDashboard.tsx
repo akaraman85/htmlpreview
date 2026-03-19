@@ -480,6 +480,21 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
                     >
                       Created: {new Date(snippet.createdAt).toLocaleString()}
                     </p>
+                    {snippet.passphraseHash && (
+                      <div
+                        className="mb-2 rounded-lg border px-3 py-2 text-xs"
+                        style={{
+                          borderColor: "#5BC0BE",
+                          backgroundColor: "#CDEFEF",
+                          color: "#1C2541",
+                        }}
+                      >
+                        <span className="font-medium">🔒 Passphrase Protected</span>
+                        <p className="mt-1 text-xs opacity-75">
+                          This snippet requires a passphrase to view. The original passphrase cannot be retrieved (it's securely hashed).
+                        </p>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/p/${snippet.id}`}
