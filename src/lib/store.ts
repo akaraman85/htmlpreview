@@ -20,6 +20,7 @@ export async function saveSnippet(snippet: HtmlSnippet): Promise<void> {
       access: "private",
       contentType: "application/json",
       addRandomSuffix: false,
+      allowOverwrite: true,
       token,
     });
   } catch (error) {
