@@ -76,8 +76,8 @@ export default async function PublicSnippetPage({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 px-4 py-8 md:px-8">
-      <header className="flex flex-col gap-1">
+    <main className="flex h-screen w-full flex-col">
+      <header className="flex flex-shrink-0 flex-col gap-1 border-b border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900 md:px-8">
         <h1 className="text-2xl font-semibold">
           {snippet.title ?? "Shared HTML Snippet"}
         </h1>
@@ -86,11 +86,11 @@ export default async function PublicSnippetPage({
         </p>
       </header>
 
-      <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+      <section className="flex-1 overflow-hidden">
         <iframe
           title={snippet.title ?? `snippet-${snippet.id}`}
           srcDoc={snippet.html}
-          className="h-[80vh] w-full"
+          className="h-full w-full"
           sandbox=""
         />
       </section>
