@@ -1,13 +1,13 @@
 ---
-description: gistio app architecture and Vercel deployment context
+description: HTMLPreview app architecture and Vercel deployment context
 alwaysApply: true
 ---
 
-# gistio - HTML Snippet Hosting Service
+# HTMLPreview - HTML Snippet Hosting Service
 
 ## Overview
 
-`gistio` is a Vercel-deployed Next.js application that provides an authenticated API for storing HTML snippets and serving them on public URLs. Think of it as a pastebin/Gist service specifically for HTML content.
+HTMLPreview is a Vercel-deployed Next.js application that provides an authenticated API for storing HTML snippets and serving them on public URLs. Think of it as a pastebin/Gist service specifically for HTML content.
 
 ## Deployment
 

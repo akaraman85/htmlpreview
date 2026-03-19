@@ -4,12 +4,12 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-<!-- BEGIN:gistio-app-context -->
-# gistio - Vercel Next.js App
+<!-- BEGIN:htmlpreview-app-context -->
+# HTMLPreview - Vercel Next.js App
 
-## What is gistio?
+## What is HTMLPreview?
 
-`gistio` is a Vercel-ready Next.js application for storing raw HTML snippets via authenticated API calls and serving each snippet on a public URL. It's essentially a pastebin/Gist service specifically for HTML content.
+HTMLPreview is a Vercel-ready Next.js application for storing raw HTML snippets via authenticated API calls and serving each snippet on a public URL. It's essentially a pastebin/Gist service specifically for HTML content.
 
 ## Architecture
 
@@ -45,4 +45,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Vercel Blob storage is required - create a Blob store in Vercel dashboard (token is auto-injected)
 - Passphrases are hashed with PBKDF2 (100k iterations, SHA-256) and cannot be recovered
 - HTML is rendered in sandboxed iframes for security isolation
-<!-- END:gistio-app-context -->
+<!-- END:htmlpreview-app-context -->

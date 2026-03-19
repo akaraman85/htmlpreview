@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "gistio",
-  description: "Store HTML via API and share with public URLs",
+  title: "HTMLPreview",
+  description: "Store HTML snippets via API and share them instantly with public URLs",
 };
 
 export default function RootLayout({

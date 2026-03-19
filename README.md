@@ -1,6 +1,6 @@
-# gistio
+# HTMLPreview
 
-`gistio` is a Vercel-ready Next.js app for storing raw HTML via authenticated API calls and serving each snippet on a public URL.
+HTMLPreview is a Vercel-ready Next.js app for storing raw HTML via authenticated API calls and serving each snippet on a public URL.
 
 ## Features
 
@@ -35,7 +35,7 @@ Create a snippet:
 curl -X POST "http://localhost:3000/api/snippets" \
   -H "Authorization: Bearer $API_WRITE_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"title":"Sample","html":"<h1>Hello</h1><p>From gistio</p>"}'
+  -d '{"title":"Sample","html":"<h1>Hello</h1><p>From HTMLPreview</p>"}'
 ```
 
 Create a protected snippet with a passphrase:
