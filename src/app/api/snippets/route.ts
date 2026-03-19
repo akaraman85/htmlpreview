@@ -35,10 +35,14 @@ export async function POST(request: Request) {
       ? body.title.trim().slice(0, 120)
       : undefined;
 
-  const passphraseHash =
+  const rawPassphrase =
     typeof body.passphrase === "string" && body.passphrase.trim() !== ""
-      ? hashPassphrase(body.passphrase.trim())
+      ? body.passphrase.trim()
       : undefined;
+
+  const passphraseHash = rawPassphrase
+    ? hashPassphrase(rawPassphrase)
+    : undefined;
 
   const id = randomUUID();
   const snippet: HtmlSnippet = {
@@ -67,9 +71,14 @@ export async function POST(request: Request) {
     );
   }
 
+  // Include passphrase in publicUrl if provided
+  const publicUrl = rawPassphrase
+    ? `/p/${id}?passphrase=${encodeURIComponent(rawPassphrase)}`
+    : `/p/${id}`;
+
   return NextResponse.json({
     id,
     apiUrl: `/api/snippets/${id}`,
-    publicUrl: `/p/${id}`,
+    publicUrl,
   });
 }
