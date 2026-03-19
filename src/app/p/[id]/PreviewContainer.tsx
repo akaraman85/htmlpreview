@@ -50,7 +50,7 @@ export function PreviewContainer({ html, title }: PreviewContainerProps) {
           title={title}
           srcDoc={html}
           style={iframeStyle}
-          sandbox=""
+          sandbox="allow-scripts allow-same-origin"
         />
       </section>
     </div>
