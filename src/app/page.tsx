@@ -48,63 +48,93 @@ export default function Home() {
       {/* Features Grid */}
       <div className="grid gap-4 md:grid-cols-3">
         <div 
-          className="rounded-xl border p-6"
+          className="group relative cursor-pointer rounded-xl border p-6 transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-105 hover:shadow-xl"
           style={{ 
             borderColor: '#E3EAF2',
             backgroundColor: '#F7F9FB'
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#5BC0BE';
+            e.currentTarget.style.backgroundColor = '#CDEFEF';
+            e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(91, 192, 190, 0.2), 0 10px 10px -5px rgba(91, 192, 190, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '#E3EAF2';
+            e.currentTarget.style.backgroundColor = '#F7F9FB';
+            e.currentTarget.style.boxShadow = '';
+          }}
         >
-          <div className="mb-3 text-2xl">🔐</div>
+          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">🔐</div>
           <h3 
-            className="mb-2 font-semibold"
+            className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
           >
             Secure API
           </h3>
           <p 
-            className="text-sm"
+            className="text-sm transition-colors duration-300"
             style={{ color: '#6C7A89' }}
           >
             Authenticated write access with optional passphrase protection
           </p>
         </div>
         <div 
-          className="rounded-xl border p-6"
+          className="group relative cursor-pointer rounded-xl border p-6 transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-105 hover:shadow-xl"
           style={{ 
             borderColor: '#E3EAF2',
             backgroundColor: '#F7F9FB'
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#5BC0BE';
+            e.currentTarget.style.backgroundColor = '#CDEFEF';
+            e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(91, 192, 190, 0.2), 0 10px 10px -5px rgba(91, 192, 190, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '#E3EAF2';
+            e.currentTarget.style.backgroundColor = '#F7F9FB';
+            e.currentTarget.style.boxShadow = '';
+          }}
         >
-          <div className="mb-3 text-2xl">⚡</div>
+          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">⚡</div>
           <h3 
-            className="mb-2 font-semibold"
+            className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
           >
             Instant Sharing
           </h3>
           <p 
-            className="text-sm"
+            className="text-sm transition-colors duration-300"
             style={{ color: '#6C7A89' }}
           >
             Get a public URL immediately after uploading your HTML
           </p>
         </div>
         <div 
-          className="rounded-xl border p-6"
+          className="group relative cursor-pointer rounded-xl border p-6 transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-105 hover:shadow-xl"
           style={{ 
             borderColor: '#E3EAF2',
             backgroundColor: '#F7F9FB'
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#5BC0BE';
+            e.currentTarget.style.backgroundColor = '#CDEFEF';
+            e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(91, 192, 190, 0.2), 0 10px 10px -5px rgba(91, 192, 190, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '#E3EAF2';
+            e.currentTarget.style.backgroundColor = '#F7F9FB';
+            e.currentTarget.style.boxShadow = '';
+          }}
         >
-          <div className="mb-3 text-2xl">🎨</div>
+          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">🎨</div>
           <h3 
-            className="mb-2 font-semibold"
+            className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
           >
             Sandboxed Rendering
           </h3>
           <p 
-            className="text-sm"
+            className="text-sm transition-colors duration-300"
             style={{ color: '#6C7A89' }}
           >
             Safe HTML preview in isolated iframes for security
