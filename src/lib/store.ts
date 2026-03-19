@@ -1,4 +1,4 @@
-import { put, get } from "@vercel/blob";
+import { put, get, del } from "@vercel/blob";
 import type { HtmlSnippet } from "@/lib/types";
 
 const pathnameForSnippet = (id: string) => `snippets/${id}.json`;
@@ -74,5 +74,24 @@ export async function getSnippet(id: string): Promise<HtmlSnippet | null> {
   } catch (error) {
     console.error("Error fetching snippet:", error);
     return null;
+  }
+}
+
+export async function deleteSnippet(id: string): Promise<void> {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!token) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not set. Make sure the Blob store is connected to your Vercel project.",
+    );
+  }
+
+  const pathname = pathnameForSnippet(id);
+
+  try {
+    await del(pathname, { token });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to delete snippet from Blob: ${errorMessage}`);
   }
 }
