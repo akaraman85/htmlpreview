@@ -276,22 +276,35 @@ export default function Home() {
 
       {/* Response Info */}
       <section 
-        className="rounded-xl border p-6"
+        className="group relative cursor-pointer rounded-xl border p-6 transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl"
         style={{ 
           borderColor: '#E3EAF2',
           backgroundColor: '#F7F9FB'
         }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = '#5BC0BE';
+          e.currentTarget.style.backgroundColor = '#CDEFEF';
+          e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(91, 192, 190, 0.2), 0 10px 10px -5px rgba(91, 192, 190, 0.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = '#E3EAF2';
+          e.currentTarget.style.backgroundColor = '#F7F9FB';
+          e.currentTarget.style.boxShadow = '';
+        }}
       >
         <div className="mb-3 flex items-center gap-2">
-          <span className="text-xl">✨</span>
+          <span className="text-xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">✨</span>
           <h2 
-            className="text-lg font-semibold"
+            className="text-lg font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
           >
             What You Get
           </h2>
         </div>
-        <p style={{ color: '#6C7A89' }}>
+        <p 
+          className="transition-colors duration-300"
+          style={{ color: '#6C7A89' }}
+        >
           You'll receive a URL to access your stored HTML instantly. For
           protected snippets, the passphrase is automatically included in the URL.
           Update existing snippets by providing the same ID, or delete them when
