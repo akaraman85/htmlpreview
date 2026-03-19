@@ -84,6 +84,7 @@ export default function Home() {
             e.currentTarget.style.boxShadow = '';
           }}
         >
+          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">🔐</div>
           <h3 
             className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
@@ -114,6 +115,7 @@ export default function Home() {
             e.currentTarget.style.boxShadow = '';
           }}
         >
+          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">⚡</div>
           <h3 
             className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
@@ -144,6 +146,7 @@ export default function Home() {
             e.currentTarget.style.boxShadow = '';
           }}
         >
+          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">🎨</div>
           <h3 
             className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
@@ -168,12 +171,15 @@ export default function Home() {
         }}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 
-            className="text-xl font-semibold"
-            style={{ color: '#1C2541' }}
-          >
-            API Usage
-          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">💻</span>
+            <h2 
+              className="text-xl font-semibold"
+              style={{ color: '#1C2541' }}
+            >
+              API Usage
+            </h2>
+          </div>
           <button
             onClick={() => setShowModal(true)}
             className="rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
@@ -183,7 +189,7 @@ export default function Home() {
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2a3d52'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3A506B'}
           >
-            Agentic Friendly
+            🤖 Agentic Friendly
           </button>
         </div>
         <div className="space-y-4">
@@ -306,12 +312,15 @@ export default function Home() {
           e.currentTarget.style.boxShadow = '';
         }}
       >
-        <h2 
-          className="mb-3 text-lg font-semibold transition-colors duration-300"
-          style={{ color: '#1C2541' }}
-        >
-          What You Get
-        </h2>
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">✨</span>
+          <h2 
+            className="text-lg font-semibold transition-colors duration-300"
+            style={{ color: '#1C2541' }}
+          >
+            What You Get
+          </h2>
+        </div>
         <p 
           className="transition-colors duration-300"
           style={{ color: '#6C7A89' }}
