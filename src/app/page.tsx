@@ -86,6 +86,36 @@ export default function Home() {
   -d '{"title":"Protected","html":"<h1>Secret</h1>","passphrase":"my-secret"}'`}
             </pre>
           </div>
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Update existing snippet:
+              </span>
+              <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                Update
+              </span>
+            </div>
+            <pre className="overflow-x-auto rounded-lg bg-gradient-to-br from-zinc-950 to-zinc-900 p-4 text-sm text-zinc-100 shadow-inner">
+              {`curl -X POST "${baseUrl}/api/snippets" \\
+  -H "Authorization: Bearer $API_WRITE_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"id":"existing-id","title":"Updated","html":"<h1>New Content</h1>"}'`}
+            </pre>
+          </div>
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Delete snippet:
+              </span>
+              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                Delete
+              </span>
+            </div>
+            <pre className="overflow-x-auto rounded-lg bg-gradient-to-br from-zinc-950 to-zinc-900 p-4 text-sm text-zinc-100 shadow-inner">
+              {`curl -X DELETE "${baseUrl}/api/snippets/<id>" \\
+  -H "Authorization: Bearer $API_WRITE_TOKEN"`}
+            </pre>
+          </div>
         </div>
       </section>
 
@@ -97,8 +127,9 @@ export default function Home() {
         </div>
         <p className="text-zinc-700 dark:text-zinc-300">
           You'll receive a URL to access your stored HTML instantly. For
-          protected snippets, visitors will need to enter the passphrase to view
-          the content. Simple, secure, and fast! 🎉
+          protected snippets, the passphrase is automatically included in the URL.
+          Update existing snippets by providing the same ID, or delete them when
+          no longer needed. Simple, secure, and fast! 🎉
         </p>
       </section>
     </main>
