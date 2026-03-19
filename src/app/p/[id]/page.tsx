@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { verifyPassphrase } from "@/lib/passphrase";
 import { getSnippet } from "@/lib/store";
+import { HeaderLink } from "./HeaderLink";
 import { PassphraseForm } from "./PassphraseForm";
 import { PreviewContainer } from "./PreviewContainer";
 
@@ -88,19 +88,7 @@ export default async function PublicSnippetPage({
             Created at {new Date(snippet.createdAt).toLocaleString()}
           </p>
         </div>
-        <Link
-          href="/"
-          className="text-xs font-medium transition-colors hover:underline"
-          style={{ color: "#3A506B" }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = "#5BC0BE";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = "#3A506B";
-          }}
-        >
-          Built By HTMLPreview
-        </Link>
+        <HeaderLink />
       </header>
 
       <PreviewContainer html={snippet.html} title={snippet.title ?? `snippet-${snippet.id}`} />
