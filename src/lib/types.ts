@@ -6,3 +6,10 @@ export type HtmlSnippet = {
   title?: string;
   passphraseHash?: string;
 };
+
+export type UserToken = {
+  userId: string;
+  token: string;
+  createdAt: string;
+  name?: string;
+};

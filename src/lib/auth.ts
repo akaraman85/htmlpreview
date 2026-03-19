@@ -1,21 +1,33 @@
 import { timingSafeEqual } from "crypto";
+import { validateUserToken } from "./store";
 
 const AUTH_PREFIX = "Bearer ";
 
-export function isWriteAuthorized(authHeader: string | null): boolean {
-  const expectedToken = process.env.API_WRITE_TOKEN;
-
-  if (!expectedToken || !authHeader?.startsWith(AUTH_PREFIX)) {
+export async function isWriteAuthorized(authHeader: string | null): Promise<boolean> {
+  if (!authHeader?.startsWith(AUTH_PREFIX)) {
     return false;
   }
 
   const providedToken = authHeader.slice(AUTH_PREFIX.length).trim();
-  const expected = Buffer.from(expectedToken);
-  const provided = Buffer.from(providedToken);
 
-  if (expected.length !== provided.length) {
-    return false;
+  // Check global API_WRITE_TOKEN first
+  const expectedToken = process.env.API_WRITE_TOKEN;
+  if (expectedToken) {
+    const expected = Buffer.from(expectedToken);
+    const provided = Buffer.from(providedToken);
+
+    if (expected.length === provided.length) {
+      if (timingSafeEqual(expected, provided)) {
+        return true;
+      }
+    }
   }
 
-  return timingSafeEqual(expected, provided);
+  // Check user-generated tokens
+  const userToken = await validateUserToken(providedToken);
+  if (userToken) {
+    return true;
+  }
+
+  return false;
 }

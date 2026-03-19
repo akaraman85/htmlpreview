@@ -13,7 +13,7 @@ type CreateSnippetBody = {
 };
 
 export async function POST(request: Request) {
-  if (!isWriteAuthorized(request.headers.get("authorization"))) {
+  if (!(await isWriteAuthorized(request.headers.get("authorization")))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

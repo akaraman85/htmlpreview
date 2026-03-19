@@ -9,14 +9,29 @@ HTMLPreview is a Vercel-ready Next.js app for storing raw HTML via authenticated
 - Public render page (`/p/:id`)
 - Optional passphrase protection for snippets
 - Vercel Blob storage for persistence
+- Admin dashboard with Google OAuth login
+- User-generated API tokens for personalized access
 
 ## Environment variables
 
 Copy `.env.example` to `.env.local` and set:
 
-- `API_WRITE_TOKEN` (your shared secret for write calls)
+- `API_WRITE_TOKEN` (optional - your shared secret for write calls, users can also generate their own tokens)
+- `GOOGLE_CLIENT_ID` (required for admin dashboard - get from [Google Cloud Console](https://console.cloud.google.com/))
+- `GOOGLE_CLIENT_SECRET` (required for admin dashboard - get from [Google Cloud Console](https://console.cloud.google.com/))
+- `AUTH_SECRET` (required for NextAuth - generate with `openssl rand -base64 32`)
 
 **Note:** `BLOB_READ_WRITE_TOKEN` is automatically set by Vercel when you create a Blob store in your project. No manual configuration needed!
+
+### Setting up Google OAuth
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the Google+ API
+4. Go to "Credentials" → "Create Credentials" → "OAuth client ID"
+5. Choose "Web application"
+6. Add authorized redirect URI: `https://your-domain.com/api/auth/callback/google` (or `http://localhost:3000/api/auth/callback/google` for local dev)
+7. Copy the Client ID and Client Secret to your environment variables
 
 ## Local development
 

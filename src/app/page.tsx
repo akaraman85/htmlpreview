@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AgenticFriendlyModal } from "./AgenticFriendlyModal";
 
 export default function Home() {
@@ -14,6 +15,26 @@ export default function Home() {
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-12 md:px-8">
+      {/* Admin Link */}
+      <div className="flex justify-end">
+        <Link
+          href="/admin"
+          className="rounded-lg px-4 py-2 text-sm font-medium transition-all active:scale-95"
+          style={{
+            backgroundColor: "#E3EAF2",
+            color: "#1C2541",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#CDEFEF";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#E3EAF2";
+          }}
+        >
+          🔐 Admin Dashboard
+        </Link>
+      </div>
+
       {/* Hero Section */}
       <div className="text-center">
         <div 

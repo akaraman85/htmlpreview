@@ -1,7 +1,9 @@
-import { put, get, del } from "@vercel/blob";
-import type { HtmlSnippet } from "@/lib/types";
+import { put, get, del, list } from "@vercel/blob";
+import type { HtmlSnippet, UserToken } from "@/lib/types";
+import { randomBytes, timingSafeEqual } from "crypto";
 
 const pathnameForSnippet = (id: string) => `snippets/${id}.json`;
+const pathnameForUserToken = (userId: string, tokenId: string) => `tokens/${userId}/${tokenId}.json`;
 
 export async function saveSnippet(snippet: HtmlSnippet): Promise<void> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -94,5 +96,222 @@ export async function deleteSnippet(id: string): Promise<void> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to delete snippet from Blob: ${errorMessage}`);
+  }
+}
+
+// User Token Management Functions
+export async function generateUserToken(userId: string, name?: string): Promise<UserToken> {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!blobToken) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not set. Make sure the Blob store is connected to your Vercel project.",
+    );
+  }
+
+  // Generate a secure random token
+  const apiToken = randomBytes(32).toString("hex");
+  const tokenId = randomBytes(16).toString("hex");
+  
+  const userToken: UserToken = {
+    userId,
+    token: apiToken,
+    createdAt: new Date().toISOString(),
+    name: name || "Default Token",
+  };
+
+  const pathname = pathnameForUserToken(userId, tokenId);
+  const jsonData = JSON.stringify(userToken);
+
+  try {
+    await put(pathname, jsonData, {
+      access: "private",
+      contentType: "application/json",
+      addRandomSuffix: false,
+      allowOverwrite: false,
+      token: blobToken,
+    });
+    
+    return userToken;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to save user token: ${errorMessage}`);
+  }
+}
+
+export async function getUserTokens(userId: string): Promise<UserToken[]> {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!blobToken) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not set. Make sure the Blob store is connected to your Vercel project.",
+    );
+  }
+
+  try {
+    const prefix = `tokens/${userId}/`;
+    const { blobs } = await list({ prefix, token: blobToken });
+    
+    const tokens: UserToken[] = [];
+    
+    for (const blob of blobs) {
+      try {
+        const blobData = await get(blob.pathname, {
+          access: "private",
+          token: blobToken,
+        });
+        
+        if (!blobData || !blobData.stream) continue;
+        
+        const reader = blobData.stream.getReader();
+        const chunks: Uint8Array[] = [];
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        
+        const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+        const combined = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of chunks) {
+          combined.set(chunk, offset);
+          offset += chunk.length;
+        }
+        
+        const jsonData = new TextDecoder().decode(combined);
+        const token = JSON.parse(jsonData) as UserToken;
+        tokens.push(token);
+      } catch (error) {
+        console.error(`Error reading token ${blob.pathname}:`, error);
+      }
+    }
+    
+    return tokens.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  } catch (error) {
+    console.error("Error fetching user tokens:", error);
+    return [];
+  }
+}
+
+export async function validateUserToken(providedToken: string): Promise<UserToken | null> {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!blobToken) {
+    return null;
+  }
+
+  try {
+    // List all tokens to find a match
+    const { blobs } = await list({ prefix: "tokens/", token: blobToken });
+    
+    for (const blob of blobs) {
+      try {
+        const blobData = await get(blob.pathname, {
+          access: "private",
+          token: blobToken,
+        });
+        
+        if (!blobData || !blobData.stream) continue;
+        
+        const reader = blobData.stream.getReader();
+        const chunks: Uint8Array[] = [];
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        
+        const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+        const combined = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of chunks) {
+          combined.set(chunk, offset);
+          offset += chunk.length;
+        }
+        
+        const jsonData = new TextDecoder().decode(combined);
+        const token = JSON.parse(jsonData) as UserToken;
+        
+        // Use timing-safe comparison
+        const expected = Buffer.from(token.token);
+        const provided = Buffer.from(providedToken);
+        
+        if (expected.length === provided.length) {
+          if (timingSafeEqual(expected, provided)) {
+            return token;
+          }
+        }
+      } catch (error) {
+        console.error(`Error reading token ${blob.pathname}:`, error);
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error validating user token:", error);
+    return null;
+  }
+}
+
+export async function deleteUserToken(userId: string, token: string): Promise<void> {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!blobToken) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not set. Make sure the Blob store is connected to your Vercel project.",
+    );
+  }
+
+  try {
+    const prefix = `tokens/${userId}/`;
+    const { blobs } = await list({ prefix, token: blobToken });
+    
+    for (const blob of blobs) {
+      try {
+        const blobData = await get(blob.pathname, {
+          access: "private",
+          token: blobToken,
+        });
+        
+        if (!blobData || !blobData.stream) continue;
+        
+        const reader = blobData.stream.getReader();
+        const chunks: Uint8Array[] = [];
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        
+        const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+        const combined = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of chunks) {
+          combined.set(chunk, offset);
+          offset += chunk.length;
+        }
+        
+        const jsonData = new TextDecoder().decode(combined);
+        const userToken = JSON.parse(jsonData) as UserToken;
+        
+        if (userToken.token === token) {
+          await del(blob.pathname, { token: blobToken });
+          return;
+        }
+      } catch (error) {
+        console.error(`Error reading token ${blob.pathname}:`, error);
+      }
+    }
+    
+    throw new Error("Token not found");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to delete user token: ${errorMessage}`);
   }
 }

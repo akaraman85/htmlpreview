@@ -48,7 +48,7 @@ export async function GET(request: Request, { params }: Params) {
 
 export async function DELETE(request: Request, { params }: Params) {
   // Require API token authentication for deletion
-  if (!isWriteAuthorized(request.headers.get("authorization"))) {
+  if (!(await isWriteAuthorized(request.headers.get("authorization")))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
