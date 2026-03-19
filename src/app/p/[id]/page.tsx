@@ -78,13 +78,15 @@ export default async function PublicSnippetPage({
 
   return (
     <main className="flex h-screen w-full flex-col">
-      <header className="flex flex-shrink-0 flex-col gap-1 border-b border-zinc-200 bg-white px-4 py-4 dark:border-zinc-800 dark:bg-zinc-900 md:px-8">
-        <h1 className="text-2xl font-semibold">
-          {snippet.title ?? "Shared HTML Snippet"}
-        </h1>
-        <p className="text-sm text-zinc-500">
-          Created at {new Date(snippet.createdAt).toLocaleString()}
-        </p>
+      <header className="flex flex-shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900 md:px-6">
+        <div className="flex items-center gap-3">
+          <h1 className="text-lg font-semibold">
+            {snippet.title ?? "Shared HTML Snippet"}
+          </h1>
+          <p className="text-xs text-zinc-500">
+            Created at {new Date(snippet.createdAt).toLocaleString()}
+          </p>
+        </div>
       </header>
 
       <PreviewContainer html={snippet.html} title={snippet.title ?? `snippet-${snippet.id}`} />
