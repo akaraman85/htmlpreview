@@ -56,10 +56,16 @@ export async function POST(request: Request) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     console.error("Failed to save snippet:", errorMessage);
+    
+    // In production, show a user-friendly message but log the actual error
     return NextResponse.json(
       {
         error: "Storage is not configured on this deployment",
-        details: process.env.NODE_ENV === "development" ? errorMessage : undefined,
+        details: errorMessage.includes("BLOB_READ_WRITE_TOKEN")
+          ? "Blob store token not found. Please ensure the Blob store is connected to this project in Vercel."
+          : process.env.NODE_ENV === "development"
+          ? errorMessage
+          : undefined,
       },
       { status: 500 },
     );
