@@ -155,14 +155,47 @@ curl -X DELETE "${baseUrl}/api/snippets/<id>" \\
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(28, 37, 65, 0.5)' }}
+    >
+      <div 
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-xl shadow-2xl"
+        style={{ 
+          borderColor: '#E3EAF2',
+          backgroundColor: '#FFFFFF',
+          borderWidth: '1px',
+          borderStyle: 'solid'
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-950">
-          <h2 className="text-xl font-semibold">Agentic Friendly API Documentation</h2>
+        <div 
+          className="flex items-center justify-between border-b px-6 py-4"
+          style={{ 
+            borderColor: '#E3EAF2',
+            backgroundColor: '#F7F9FB'
+          }}
+        >
+          <h2 
+            className="text-xl font-semibold"
+            style={{ color: '#1C2541' }}
+          >
+            Agentic Friendly API Documentation
+          </h2>
           <button
             onClick={onClose}
-            className="rounded-md p-2 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+            className="rounded-md p-2 transition-colors"
+            style={{ 
+              color: '#6C7A89'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#E3EAF2';
+              e.currentTarget.style.color = '#1C2541';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#6C7A89';
+            }}
             aria-label="Close"
           >
             <svg
@@ -189,10 +222,29 @@ curl -X DELETE "${baseUrl}/api/snippets/<id>" \\
         </div>
 
         {/* Footer with Copy Button */}
-        <div className="border-t border-zinc-200 bg-zinc-50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-950">
+        <div 
+          className="border-t px-6 py-4"
+          style={{ 
+            borderColor: '#E3EAF2',
+            backgroundColor: '#F7F9FB'
+          }}
+        >
           <button
             onClick={handleCopy}
-            className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-lg font-semibold text-white transition-all hover:from-blue-700 hover:to-purple-700 active:scale-95 dark:from-blue-500 dark:to-purple-500"
+            className="w-full rounded-lg px-6 py-4 text-lg font-semibold text-white transition-all active:scale-95"
+            style={{ 
+              backgroundColor: copied ? '#5BC0BE' : '#3A506B'
+            }}
+            onMouseEnter={(e) => {
+              if (!copied) {
+                e.currentTarget.style.backgroundColor = '#2a3d52';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!copied) {
+                e.currentTarget.style.backgroundColor = '#3A506B';
+              }
+            }}
           >
             {copied ? "✓ Copied!" : "📋 Copy Instructions"}
           </button>
