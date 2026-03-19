@@ -14,41 +14,40 @@ export default function Home() {
       : "http://localhost:3000";
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 py-12 md:px-8">
-      {/* Admin Link */}
-      <div className="flex justify-end">
-        <Link
-          href="/admin"
-          className="rounded-lg px-4 py-2 text-sm font-medium transition-all active:scale-95"
-          style={{
-            backgroundColor: "#E3EAF2",
-            color: "#1C2541",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#CDEFEF";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#E3EAF2";
-          }}
-        >
-          🔐 Admin Dashboard
-        </Link>
-      </div>
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 py-8 md:px-8">
+      {/* Header Navigation */}
+      <header className="flex items-center justify-between border-b pb-4" style={{ borderColor: '#E3EAF2' }}>
+        <div className="flex items-center gap-3">
+          <h1 
+            className="text-xl font-semibold"
+            style={{ color: '#1C2541' }}
+          >
+            HTMLPreview
+          </h1>
+        </div>
+        <nav>
+          <Link
+            href="/admin"
+            className="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            style={{
+              color: "#6C7A89",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#3A506B";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#6C7A89";
+            }}
+          >
+            Admin
+          </Link>
+        </nav>
+      </header>
 
       {/* Hero Section */}
       <div className="text-center">
-        <div 
-          className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
-          style={{ 
-            backgroundColor: 'rgba(91, 192, 190, 0.1)',
-            color: '#3A506B'
-          }}
-        >
-          <span className="text-lg">🚀</span>
-          <span>HTML Snippet Hosting</span>
-        </div>
-        <h1 
-          className="mb-4 bg-clip-text text-5xl font-bold tracking-tight text-transparent"
+        <h2 
+          className="mb-6 bg-clip-text text-6xl font-bold tracking-tight text-transparent"
           style={{ 
             backgroundImage: 'linear-gradient(to right, #3A506B, #5BC0BE)',
             WebkitBackgroundClip: 'text',
@@ -56,9 +55,9 @@ export default function Home() {
           }}
         >
           HTMLPreview
-        </h1>
+        </h2>
         <p 
-          className="mx-auto max-w-2xl text-lg"
+          className="mx-auto max-w-2xl text-xl leading-relaxed"
           style={{ color: '#6C7A89' }}
         >
           Store your HTML snippets via API and share them instantly with a
@@ -67,7 +66,7 @@ export default function Home() {
       </div>
 
       {/* Features Grid */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3">
         <div 
           className="group relative cursor-pointer rounded-xl border p-6 transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-105 hover:shadow-xl"
           style={{ 
@@ -85,7 +84,6 @@ export default function Home() {
             e.currentTarget.style.boxShadow = '';
           }}
         >
-          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">🔐</div>
           <h3 
             className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
@@ -116,7 +114,6 @@ export default function Home() {
             e.currentTarget.style.boxShadow = '';
           }}
         >
-          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">⚡</div>
           <h3 
             className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
@@ -147,7 +144,6 @@ export default function Home() {
             e.currentTarget.style.boxShadow = '';
           }}
         >
-          <div className="mb-3 text-2xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">🎨</div>
           <h3 
             className="mb-2 font-semibold transition-colors duration-300"
             style={{ color: '#1C2541' }}
@@ -172,25 +168,22 @@ export default function Home() {
         }}
       >
         <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">💻</span>
-            <h2 
-              className="text-xl font-semibold"
-              style={{ color: '#1C2541' }}
-            >
-              API Usage
-            </h2>
-          </div>
+          <h2 
+            className="text-xl font-semibold"
+            style={{ color: '#1C2541' }}
+          >
+            API Usage
+          </h2>
           <button
             onClick={() => setShowModal(true)}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white transition-all active:scale-95"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
             style={{ 
               backgroundColor: '#3A506B'
             }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2a3d52'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3A506B'}
           >
-            🤖 Agentic Friendly
+            Agentic Friendly
           </button>
         </div>
         <div className="space-y-4">
@@ -313,15 +306,12 @@ export default function Home() {
           e.currentTarget.style.boxShadow = '';
         }}
       >
-        <div className="mb-3 flex items-center gap-2">
-          <span className="text-xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">✨</span>
-          <h2 
-            className="text-lg font-semibold transition-colors duration-300"
-            style={{ color: '#1C2541' }}
-          >
-            What You Get
-          </h2>
-        </div>
+        <h2 
+          className="mb-3 text-lg font-semibold transition-colors duration-300"
+          style={{ color: '#1C2541' }}
+        >
+          What You Get
+        </h2>
         <p 
           className="transition-colors duration-300"
           style={{ color: '#6C7A89' }}
@@ -329,7 +319,7 @@ export default function Home() {
           You'll receive a URL to access your stored HTML instantly. For
           protected snippets, the passphrase is automatically included in the URL.
           Update existing snippets by providing the same ID, or delete them when
-          no longer needed. Simple, secure, and fast! 🎉
+          no longer needed. Simple, secure, and fast.
         </p>
       </section>
 
