@@ -18,34 +18,56 @@ HTMLPreview is a Vercel-deployed Next.js application that provides an authentica
 ## Core Functionality
 
 ### Write Operations
-- `POST /api/snippets` - Create snippets (requires `API_WRITE_TOKEN`)
-- Accepts: `title` (optional), `html` (required), `passphrase` (optional)
+- `POST /api/snippets` - Create snippets (requires `API_WRITE_TOKEN` or user-generated token)
+- Accepts: `title` (optional), `html` (required), `passphrase` (optional), `id` (optional, for updates)
 - Returns: `{ id, apiUrl, publicUrl }`
+- `DELETE /api/snippets/:id` - Delete snippets (requires authentication)
 
 ### Read Operations
 - `GET /api/snippets/:id` - Fetch snippet JSON (public, but requires passphrase if protected)
 - `GET /p/:id` - View snippet in browser (server-rendered page with iframe)
 
+### Admin Dashboard
+- `GET /admin` - Admin dashboard (protected, requires Google OAuth)
+- `GET /api/admin/tokens` - List user's API tokens
+- `POST /api/admin/tokens` - Generate new API token
+- `DELETE /api/admin/tokens` - Delete API token
+
 ### Security
-- Write auth: Bearer token (`API_WRITE_TOKEN` env var)
+- Write auth: Bearer token (supports both `API_WRITE_TOKEN` env var and user-generated tokens)
+- Admin auth: Google OAuth via NextAuth.js v5
 - Per-snippet protection: Optional passphrase hashed with PBKDF2
 - HTML rendering: Sandboxed iframes for isolation
 
 ## Key Files
 
-- `src/lib/auth.ts` - Bearer token authentication
+- `src/lib/auth.ts` - Bearer token authentication (supports global and user tokens)
 - `src/lib/passphrase.ts` - PBKDF2 passphrase hashing/verification
-- `src/lib/store.ts` - Vercel Blob storage operations
-- `src/lib/types.ts` - TypeScript types for snippets
+- `src/lib/store.ts` - Vercel Blob storage operations (snippets and user tokens)
+- `src/lib/types.ts` - TypeScript types for snippets and user tokens
+- `src/lib/auth-config.ts` - NextAuth.js configuration with Google OAuth
+- `src/auth.ts` - NextAuth.js handlers and auth functions
+- `src/middleware.ts` - Route protection for admin pages
 - `src/app/api/snippets/route.ts` - POST endpoint for creating snippets
-- `src/app/api/snippets/[id]/route.ts` - GET endpoint for fetching snippets
+- `src/app/api/snippets/[id]/route.ts` - GET/DELETE endpoints for snippets
+- `src/app/api/auth/[...nextauth]/route.ts` - NextAuth.js API route handler
+- `src/app/api/admin/tokens/route.ts` - Token management API endpoints
+- `src/app/admin/page.tsx` - Admin dashboard page (server component)
+- `src/app/admin/AdminDashboard.tsx` - Admin dashboard UI (client component)
 - `src/app/p/[id]/page.tsx` - Public view page with passphrase form
 
 ## Environment Variables
 
 Required for deployment:
-- `API_WRITE_TOKEN` - Secret token for write authentication
+- `API_WRITE_TOKEN` - Optional secret token for write authentication (backward compatible)
 - `BLOB_READ_WRITE_TOKEN` - Automatically set by Vercel when you create a Blob store (no manual setup needed)
+- `GOOGLE_CLIENT_ID` - Required for admin dashboard (Google OAuth)
+- `GOOGLE_CLIENT_SECRET` - Required for admin dashboard (Google OAuth)
+- `AUTH_SECRET` - Required for NextAuth.js (generate with `openssl rand -base64 32`)
+
+**Google OAuth Setup:**
+- Redirect URI must be: `https://htmlpreview-phi.vercel.app/api/auth/callback/google`
+- Configure in Google Cloud Console → APIs & Services → Credentials
 
 ## Storage Schema
 
@@ -63,10 +85,25 @@ Data structure:
 }
 ```
 
+User tokens stored in Vercel Blob with pathname pattern: `tokens/<userId>/<tokenId>.json`
+
+Token structure:
+```typescript
+{
+  userId: string;
+  token: string; // Secure random token (64 hex characters)
+  createdAt: string;
+  name?: string; // Optional token name
+}
+```
+
 ## When Making Changes
 
 - Always check Vercel deployment requirements
-- Ensure environment variables are set in Vercel dashboard
+- Ensure environment variables are set in Vercel dashboard (including Google OAuth credentials)
 - Create a Blob store in Vercel dashboard (BLOB_READ_WRITE_TOKEN is auto-injected)
 - Remember: passphrases are one-way hashed - cannot be recovered
 - HTML is rendered in sandboxed iframes - scripts are isolated
+- Admin routes are protected by middleware - unauthenticated users redirect to `/api/auth/signin`
+- API authentication checks both global `API_WRITE_TOKEN` and user-generated tokens (timing-safe comparison)
+- User tokens are stored per-user in Vercel Blob for isolation
