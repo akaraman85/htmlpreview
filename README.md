@@ -7,6 +7,7 @@
 - Authenticated write API (`POST /api/snippets`)
 - Read API (`GET /api/snippets/:id`)
 - Public render page (`/p/:id`)
+- Optional passphrase protection for snippets
 - Redis-backed persistence via Upstash
 
 ## Environment variables
@@ -37,6 +38,15 @@ curl -X POST "http://localhost:3000/api/snippets" \
   -d '{"title":"Sample","html":"<h1>Hello</h1><p>From gistio</p>"}'
 ```
 
+Create a protected snippet with a passphrase:
+
+```bash
+curl -X POST "http://localhost:3000/api/snippets" \
+  -H "Authorization: Bearer $API_WRITE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Protected","html":"<h1>Secret</h1>","passphrase":"my-secret-pass"}'
+```
+
 Success response:
 
 ```json
@@ -53,8 +63,16 @@ Fetch a snippet payload:
 curl "http://localhost:3000/api/snippets/<id>"
 ```
 
+Fetch a protected snippet (requires passphrase):
+
+```bash
+curl "http://localhost:3000/api/snippets/<id>?passphrase=my-secret-pass"
+```
+
 Open the public page:
 
 ```bash
 open "http://localhost:3000/p/<id>"
 ```
+
+Protected snippets will show a passphrase form. After entering the correct passphrase, the snippet will be displayed.

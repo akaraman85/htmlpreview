@@ -1,12 +1,14 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { isWriteAuthorized } from "@/lib/auth";
+import { hashPassphrase } from "@/lib/passphrase";
 import { saveSnippet } from "@/lib/store";
 import type { HtmlSnippet } from "@/lib/types";
 
 type CreateSnippetBody = {
   html?: unknown;
   title?: unknown;
+  passphrase?: unknown;
 };
 
 export async function POST(request: Request) {
@@ -33,11 +35,17 @@ export async function POST(request: Request) {
       ? body.title.trim().slice(0, 120)
       : undefined;
 
+  const passphraseHash =
+    typeof body.passphrase === "string" && body.passphrase.trim() !== ""
+      ? hashPassphrase(body.passphrase.trim())
+      : undefined;
+
   const id = randomUUID();
   const snippet: HtmlSnippet = {
     id,
     html: body.html,
     title,
+    passphraseHash,
     createdBy: "api",
     createdAt: new Date().toISOString(),
   };

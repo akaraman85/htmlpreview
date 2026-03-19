@@ -4,4 +4,5 @@ export type HtmlSnippet = {
   createdAt: string;
   createdBy: string;
   title?: string;
+  passphraseHash?: string;
 };
