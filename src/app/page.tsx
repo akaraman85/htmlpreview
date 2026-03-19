@@ -1,4 +1,10 @@
 export default function Home() {
+  // Get the base URL from Vercel environment or use localhost for development
+  const baseUrl =
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10 md:px-8">
       <h1 className="text-3xl font-semibold tracking-tight">gistio</h1>
@@ -14,7 +20,7 @@ export default function Home() {
               Basic snippet:
             </p>
             <pre className="overflow-x-auto rounded bg-zinc-950 p-3 text-sm text-zinc-100">
-              {`curl -X POST "$BASE_URL/api/snippets" \\
+              {`curl -X POST "${baseUrl}/api/snippets" \\
   -H "Authorization: Bearer $API_WRITE_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{"title":"Sample","html":"<h1>Hello</h1><p>From gistio</p>"}'`}
@@ -25,7 +31,7 @@ export default function Home() {
               Protected snippet with passphrase:
             </p>
             <pre className="overflow-x-auto rounded bg-zinc-950 p-3 text-sm text-zinc-100">
-              {`curl -X POST "$BASE_URL/api/snippets" \\
+              {`curl -X POST "${baseUrl}/api/snippets" \\
   -H "Authorization: Bearer $API_WRITE_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{"title":"Protected","html":"<h1>Secret</h1>","passphrase":"my-secret"}'`}
