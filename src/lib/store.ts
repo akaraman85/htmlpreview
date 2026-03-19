@@ -46,7 +46,7 @@ export async function getSnippet(id: string): Promise<HtmlSnippet | null> {
       token,
     });
     
-    if (!blob) {
+    if (!blob || !blob.stream) {
       return null;
     }
 
