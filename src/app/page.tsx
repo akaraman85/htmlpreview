@@ -42,16 +42,10 @@ export default function Home() {
 
       <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:bg-zinc-900">
         <h2 className="mb-3 text-lg font-semibold">Response</h2>
-        <pre className="overflow-x-auto rounded bg-zinc-950 p-3 text-sm text-zinc-100">
-          {`{
-  "id": "1f6ec038-7a4d-44d8-af6e-cf97e42402e9",
-  "apiUrl": "/api/snippets/1f6ec038-7a4d-44d8-af6e-cf97e42402e9",
-  "publicUrl": "/p/1f6ec038-7a4d-44d8-af6e-cf97e42402e9"
-}`}
-        </pre>
-        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-          For protected snippets, visitors will need to enter the passphrase to
-          view the content.
+        <p className="text-zinc-600 dark:text-zinc-300">
+          You will receive a URL to access the stored HTML. For protected
+          snippets, visitors will need to enter the passphrase to view the
+          content.
         </p>
       </section>
     </main>

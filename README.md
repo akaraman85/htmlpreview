@@ -8,15 +8,15 @@
 - Read API (`GET /api/snippets/:id`)
 - Public render page (`/p/:id`)
 - Optional passphrase protection for snippets
-- Redis-backed persistence via Upstash
+- Vercel Blob storage for persistence
 
 ## Environment variables
 
 Copy `.env.example` to `.env.local` and set:
 
 - `API_WRITE_TOKEN` (your shared secret for write calls)
-- `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
+
+**Note:** `BLOB_READ_WRITE_TOKEN` is automatically set by Vercel when you create a Blob store in your project. No manual configuration needed!
 
 ## Local development
 

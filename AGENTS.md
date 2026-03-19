@@ -15,7 +15,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - **Framework**: Next.js 16.2.0 (App Router)
 - **Deployment**: Vercel
-- **Storage**: Upstash Redis (serverless Redis)
+- **Storage**: Vercel Blob (object storage)
 - **Authentication**: Bearer token for write operations (`API_WRITE_TOKEN`)
 - **Security**: Optional per-snippet passphrase protection using PBKDF2
 
@@ -29,21 +29,20 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Environment Variables
 
 - `API_WRITE_TOKEN`: Shared secret for authenticating write operations
-- `UPSTASH_REDIS_REST_URL`: Upstash Redis REST API URL
-- `UPSTASH_REDIS_REST_TOKEN`: Upstash Redis REST API token
+- `BLOB_READ_WRITE_TOKEN`: Automatically set by Vercel when you create a Blob store (no manual setup needed)
 
 ## Data Flow
 
 1. Client sends POST with `Authorization: Bearer <API_WRITE_TOKEN>` and optional `passphrase`
 2. Server validates token, hashes passphrase (if provided), generates UUID
-3. Snippet stored in Redis with key `snippet:<id>`
+3. Snippet stored in Vercel Blob as JSON at pathname `snippets/<id>.json`
 4. Returns `{ id, apiUrl, publicUrl }`
 5. Public access via `/p/<id>` or `/api/snippets/<id>?passphrase=...` (if protected)
 
 ## Important Notes
 
 - This is a **Vercel deployment** - use Vercel environment variables for production
-- Redis storage is required - app will error if Upstash env vars are missing
+- Vercel Blob storage is required - create a Blob store in Vercel dashboard (token is auto-injected)
 - Passphrases are hashed with PBKDF2 (100k iterations, SHA-256) and cannot be recovered
 - HTML is rendered in sandboxed iframes for security isolation
 <!-- END:gistio-app-context -->
