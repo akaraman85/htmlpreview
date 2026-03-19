@@ -14,23 +14,17 @@ export const authConfig = {
       return !!auth;
     },
     session({ session, token }) {
-      // Use email as the consistent user identifier
-      // Store it in both id and ensure it's always available
-      if (session.user) {
-        // Use email as the primary identifier for consistency
-        const userId = session.user.email || token.sub || session.user.id;
-        session.user.id = userId;
-        // Also store in a custom field for clarity
-        (session.user as { userId?: string }).userId = userId;
+      // Use user ID as the consistent identifier
+      if (session.user && token.sub) {
+        session.user.id = token.sub;
       }
       return session;
     },
-    jwt({ token, user, account }) {
+    jwt({ token, user }) {
       if (user) {
-        // Use email as the primary identifier (more stable than id)
-        const userId = user.email || user.id || token.sub;
-        token.sub = userId;
-        token.userId = userId;
+        // Use user.id as the primary identifier
+        // Google OAuth provides user.id which is the Google user ID
+        token.sub = user.id;
       }
       return token;
     },
