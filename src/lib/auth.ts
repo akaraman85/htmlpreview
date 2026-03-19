@@ -4,8 +4,13 @@ import { validateUserToken } from "./store";
 const AUTH_PREFIX = "Bearer ";
 
 export async function isWriteAuthorized(authHeader: string | null): Promise<boolean> {
+  const result = await getAuthUser(authHeader);
+  return result !== null;
+}
+
+export async function getAuthUser(authHeader: string | null): Promise<{ type: "global" | "user"; userId?: string } | null> {
   if (!authHeader?.startsWith(AUTH_PREFIX)) {
-    return false;
+    return null;
   }
 
   const providedToken = authHeader.slice(AUTH_PREFIX.length).trim();
@@ -18,7 +23,7 @@ export async function isWriteAuthorized(authHeader: string | null): Promise<bool
 
     if (expected.length === provided.length) {
       if (timingSafeEqual(expected, provided)) {
-        return true;
+        return { type: "global" };
       }
     }
   }
@@ -26,8 +31,8 @@ export async function isWriteAuthorized(authHeader: string | null): Promise<bool
   // Check user-generated tokens
   const userToken = await validateUserToken(providedToken);
   if (userToken) {
-    return true;
+    return { type: "user", userId: userToken.userId };
   }
 
-  return false;
+  return null;
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isWriteAuthorized } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { verifyPassphrase } from "@/lib/passphrase";
 import { deleteSnippet, getSnippet } from "@/lib/store";
 
@@ -48,7 +48,8 @@ export async function GET(request: Request, { params }: Params) {
 
 export async function DELETE(request: Request, { params }: Params) {
   // Require API token authentication for deletion
-  if (!(await isWriteAuthorized(request.headers.get("authorization")))) {
+  const authUser = await getAuthUser(request.headers.get("authorization"));
+  if (!authUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

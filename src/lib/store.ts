@@ -99,6 +99,93 @@ export async function deleteSnippet(id: string): Promise<void> {
   }
 }
 
+export async function getUserSnippets(userId: string): Promise<HtmlSnippet[]> {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!blobToken) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not set. Make sure the Blob store is connected to your Vercel project.",
+    );
+  }
+
+  try {
+    const prefix = "snippets/";
+    const { blobs } = await list({ prefix, token: blobToken });
+    
+    const snippets: HtmlSnippet[] = [];
+    
+    for (const blob of blobs) {
+      try {
+        const blobData = await get(blob.pathname, {
+          access: "private",
+          token: blobToken,
+        });
+        
+        if (!blobData || !blobData.stream) continue;
+        
+        const reader = blobData.stream.getReader();
+        const chunks: Uint8Array[] = [];
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        
+        const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+        const combined = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of chunks) {
+          combined.set(chunk, offset);
+          offset += chunk.length;
+        }
+        
+        const jsonData = new TextDecoder().decode(combined);
+        const snippet = JSON.parse(jsonData) as HtmlSnippet;
+        
+        // Filter by user ID
+        if (snippet.createdBy === userId) {
+          snippets.push(snippet);
+        }
+      } catch (error) {
+        console.error(`Error reading snippet ${blob.pathname}:`, error);
+      }
+    }
+    
+    return snippets.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  } catch (error) {
+    console.error("Error fetching user snippets:", error);
+    return [];
+  }
+}
+
+export async function updateSnippetPassphrase(id: string, passphrase: string | null): Promise<void> {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!token) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not set. Make sure the Blob store is connected to your Vercel project.",
+    );
+  }
+
+  const snippet = await getSnippet(id);
+  if (!snippet) {
+    throw new Error("Snippet not found");
+  }
+
+  const { hashPassphrase } = await import("@/lib/passphrase");
+  const passphraseHash = passphrase && passphrase.trim() !== "" ? hashPassphrase(passphrase) : undefined;
+
+  const updatedSnippet: HtmlSnippet = {
+    ...snippet,
+    passphraseHash,
+  };
+
+  await saveSnippet(updatedSnippet);
+}
+
 // User Token Management Functions
 export async function generateUserToken(userId: string, name?: string): Promise<UserToken> {
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;

@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { isWriteAuthorized } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { hashPassphrase } from "@/lib/passphrase";
 import { getSnippet, saveSnippet } from "@/lib/store";
 import type { HtmlSnippet } from "@/lib/types";
@@ -13,7 +13,8 @@ type CreateSnippetBody = {
 };
 
 export async function POST(request: Request) {
-  if (!(await isWriteAuthorized(request.headers.get("authorization")))) {
+  const authUser = await getAuthUser(request.headers.get("authorization"));
+  if (!authUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -64,13 +65,16 @@ export async function POST(request: Request) {
 
   // If updating existing snippet, preserve original createdAt, otherwise set new one
   const createdAt = existingSnippet?.createdAt || new Date().toISOString();
+  
+  // Track who created/updated the snippet
+  const createdBy = authUser.type === "user" ? authUser.userId! : "api";
 
   const snippet: HtmlSnippet = {
     id,
     html: body.html,
     title,
     passphraseHash,
-    createdBy: "api",
+    createdBy,
     createdAt,
   };
 
