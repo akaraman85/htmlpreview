@@ -54,12 +54,29 @@ HTMLPreview is a Vercel-ready Next.js application for storing raw HTML snippets 
 - **Features**:
   - Generate personalized API tokens
   - View and manage all user tokens
-  - Delete tokens when no longer needed
+  - View all HTML snippets created by the user
+  - Add, change, or remove passphrases from snippets
+  - Inactivate tokens (tokens are marked inactive, not deleted)
 - **Token Storage**: User tokens stored in Vercel Blob at `tokens/<userId>/<tokenId>.json`
+- **Token Inactivation**: When a token is "deleted", it's marked with `deletedAt` timestamp but remains in storage for audit/query purposes
+- **Token Querying**: Inactive tokens cannot be used for authentication but can still be queried to see which snippets were created with them
 - **Authentication Flow**: 
   1. User visits `/admin` → redirected to Google OAuth if not authenticated
   2. After Google sign-in → redirected back to `/admin`
-  3. User can generate/manage tokens
+  3. User can generate/manage tokens and snippets
+
+## Token Management & Tracking
+
+- **Token Lifecycle**: 
+  - Tokens are generated with a secure random 64-character hex string
+  - When "deleted", tokens are marked inactive with `deletedAt` timestamp (not actually removed)
+  - Inactive tokens cannot be used for API authentication but remain queryable
+- **Snippet Tracking**: Each snippet stores `createdWithToken` field to track which token was used to create it
+- **Querying by Token**: Use `GET /api/admin/tokens/[token]/snippets` to query all snippets created with a specific token (works even if token is inactive)
+- **Authentication Functions**:
+  - `validateUserToken()` - Returns token if found (including inactive ones, for query purposes)
+  - `validateTokenForAuth()` - Only accepts active tokens (for authentication)
+  - `isWriteAuthorized()` - Uses `validateTokenForAuth()` to reject inactive tokens
 
 ## Important Notes
 
@@ -69,4 +86,5 @@ HTMLPreview is a Vercel-ready Next.js application for storing raw HTML snippets 
 - HTML is rendered in sandboxed iframes for security isolation
 - Admin dashboard requires Google OAuth setup - configure redirect URI: `https://htmlpreview-phi.vercel.app/api/auth/callback/google`
 - API authentication supports both global `API_WRITE_TOKEN` and user-generated tokens
+- **Token inactivation**: Tokens are never deleted, only marked inactive - this allows audit trails and querying of historical data
 <!-- END:htmlpreview-app-context -->

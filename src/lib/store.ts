@@ -99,6 +99,68 @@ export async function deleteSnippet(id: string): Promise<void> {
   }
 }
 
+export async function getSnippetsByToken(token: string): Promise<HtmlSnippet[]> {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  
+  if (!blobToken) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is not set. Make sure the Blob store is connected to your Vercel project.",
+    );
+  }
+
+  try {
+    const prefix = "snippets/";
+    const { blobs } = await list({ prefix, token: blobToken });
+    
+    const snippets: HtmlSnippet[] = [];
+    
+    for (const blob of blobs) {
+      try {
+        const blobData = await get(blob.pathname, {
+          access: "private",
+          token: blobToken,
+        });
+        
+        if (!blobData || !blobData.stream) continue;
+        
+        const reader = blobData.stream.getReader();
+        const chunks: Uint8Array[] = [];
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+        
+        const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+        const combined = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of chunks) {
+          combined.set(chunk, offset);
+          offset += chunk.length;
+        }
+        
+        const jsonData = new TextDecoder().decode(combined);
+        const snippet = JSON.parse(jsonData) as HtmlSnippet;
+        
+        // Filter by token used to create
+        if (snippet.createdWithToken === token) {
+          snippets.push(snippet);
+        }
+      } catch (error) {
+        console.error(`Error reading snippet ${blob.pathname}:`, error);
+      }
+    }
+    
+    return snippets.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  } catch (error) {
+    console.error("Error fetching snippets by token:", error);
+    return [];
+  }
+}
+
 export async function getUserSnippets(userId: string): Promise<HtmlSnippet[]> {
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
   
@@ -226,7 +288,7 @@ export async function generateUserToken(userId: string, name?: string): Promise<
   }
 }
 
-export async function getUserTokens(userId: string): Promise<UserToken[]> {
+export async function getUserTokens(userId: string, includeInactive: boolean = false): Promise<UserToken[]> {
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
   
   if (!blobToken) {
@@ -269,7 +331,10 @@ export async function getUserTokens(userId: string): Promise<UserToken[]> {
         
         const jsonData = new TextDecoder().decode(combined);
         const token = JSON.parse(jsonData) as UserToken;
-        tokens.push(token);
+        // Include all tokens if includeInactive is true, otherwise only active ones
+        if (includeInactive || !token.deletedAt) {
+          tokens.push(token);
+        }
       } catch (error) {
         console.error(`Error reading token ${blob.pathname}:`, error);
       }
@@ -330,6 +395,8 @@ export async function validateUserToken(providedToken: string): Promise<UserToke
         
         if (expected.length === provided.length) {
           if (timingSafeEqual(expected, provided)) {
+            // Return token even if inactive (for query purposes)
+            // Authentication will check deletedAt separately
             return token;
           }
         }
@@ -388,7 +455,19 @@ export async function deleteUserToken(userId: string, token: string): Promise<vo
         const userToken = JSON.parse(jsonData) as UserToken;
         
         if (userToken.token === token) {
-          await del(blob.pathname, { token: blobToken });
+          // Mark token as inactive instead of deleting
+          const updatedToken: UserToken = {
+            ...userToken,
+            deletedAt: new Date().toISOString(),
+          };
+          
+          await put(blob.pathname, JSON.stringify(updatedToken), {
+            access: "private",
+            contentType: "application/json",
+            addRandomSuffix: false,
+            allowOverwrite: true,
+            token: blobToken,
+          });
           return;
         }
       } catch (error) {

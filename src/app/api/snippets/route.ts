@@ -66,8 +66,9 @@ export async function POST(request: Request) {
   // If updating existing snippet, preserve original createdAt, otherwise set new one
   const createdAt = existingSnippet?.createdAt || new Date().toISOString();
   
-  // Track who created/updated the snippet
+  // Track who created/updated the snippet and which token was used
   const createdBy = authUser.type === "user" ? authUser.userId! : "api";
+  const createdWithToken = authUser.token; // Track the token used for audit
 
   const snippet: HtmlSnippet = {
     id,
@@ -76,6 +77,7 @@ export async function POST(request: Request) {
     passphraseHash,
     createdBy,
     createdAt,
+    createdWithToken,
   };
 
   try {

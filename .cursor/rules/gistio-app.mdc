@@ -29,9 +29,12 @@ HTMLPreview is a Vercel-deployed Next.js application that provides an authentica
 
 ### Admin Dashboard
 - `GET /admin` - Admin dashboard (protected, requires Google OAuth)
-- `GET /api/admin/tokens` - List user's API tokens
+- `GET /api/admin/tokens` - List user's API tokens (active only by default)
 - `POST /api/admin/tokens` - Generate new API token
-- `DELETE /api/admin/tokens` - Delete API token
+- `DELETE /api/admin/tokens` - Inactivate API token (marks with deletedAt, doesn't delete)
+- `GET /api/admin/snippets` - List user's HTML snippets
+- `PATCH /api/admin/snippets` - Update snippet passphrase (add/remove)
+- `GET /api/admin/tokens/[token]/snippets` - Query snippets created with a specific token (works with inactive tokens)
 
 ### Security
 - Write auth: Bearer token (supports both `API_WRITE_TOKEN` env var and user-generated tokens)
@@ -81,7 +84,8 @@ Data structure:
   title?: string;
   passphraseHash?: string; // PBKDF2 hash (salt:hash format)
   createdAt: string;
-  createdBy: string;
+  createdBy: string; // User ID or "api" for global token
+  createdWithToken?: string; // Token used to create this snippet (for audit)
 }
 ```
 
@@ -94,8 +98,30 @@ Token structure:
   token: string; // Secure random token (64 hex characters)
   createdAt: string;
   name?: string; // Optional token name
+  deletedAt?: string; // ISO timestamp when token was inactivated (not deleted)
 }
 ```
+
+**Important Token Behavior:**
+- Tokens are never actually deleted - they're marked inactive with `deletedAt`
+- Inactive tokens cannot be used for API authentication
+- Inactive tokens can still be queried to see which snippets were created with them
+- This allows audit trails and historical querying
+
+## Token Authentication & Validation
+
+- **Authentication Flow**: 
+  - `isWriteAuthorized()` uses `validateTokenForAuth()` which only accepts active tokens
+  - `validateTokenForAuth()` checks global `API_WRITE_TOKEN` first, then user tokens
+  - User tokens must not have `deletedAt` set to be valid for authentication
+- **Token Querying**:
+  - `validateUserToken()` returns tokens even if inactive (for query/audit purposes)
+  - `getSnippetsByToken()` can query snippets by any token (active or inactive)
+  - This allows auditing which snippets were created with which tokens, even after token inactivation
+- **Token Inactivation**:
+  - `deleteUserToken()` marks token with `deletedAt` timestamp instead of deleting
+  - Token remains in storage and is queryable but cannot be used for new API calls
+  - `getUserTokens()` filters out inactive tokens by default (pass `includeInactive: true` to see all)
 
 ## When Making Changes
 
@@ -107,3 +133,5 @@ Token structure:
 - Admin routes are protected by middleware - unauthenticated users redirect to `/api/auth/signin`
 - API authentication checks both global `API_WRITE_TOKEN` and user-generated tokens (timing-safe comparison)
 - User tokens are stored per-user in Vercel Blob for isolation
+- **Token inactivation**: Never actually delete tokens - mark them inactive with `deletedAt` for audit trails
+- **Snippet tracking**: Always store `createdWithToken` when creating snippets to enable token-based querying
