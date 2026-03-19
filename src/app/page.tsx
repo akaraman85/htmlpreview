@@ -8,12 +8,30 @@ export default function Home() {
 
       <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:bg-zinc-900">
         <h2 className="mb-3 text-lg font-semibold">Create snippet</h2>
-        <pre className="overflow-x-auto rounded bg-zinc-950 p-3 text-sm text-zinc-100">
-          {`curl -X POST "$BASE_URL/api/snippets" \\
+        <div className="space-y-3">
+          <div>
+            <p className="mb-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Basic snippet:
+            </p>
+            <pre className="overflow-x-auto rounded bg-zinc-950 p-3 text-sm text-zinc-100">
+              {`curl -X POST "$BASE_URL/api/snippets" \\
   -H "Authorization: Bearer $API_WRITE_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{"title":"Sample","html":"<h1>Hello</h1><p>From gistio</p>"}'`}
-        </pre>
+            </pre>
+          </div>
+          <div>
+            <p className="mb-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Protected snippet with passphrase:
+            </p>
+            <pre className="overflow-x-auto rounded bg-zinc-950 p-3 text-sm text-zinc-100">
+              {`curl -X POST "$BASE_URL/api/snippets" \\
+  -H "Authorization: Bearer $API_WRITE_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"title":"Protected","html":"<h1>Secret</h1>","passphrase":"my-secret"}'`}
+            </pre>
+          </div>
+        </div>
       </section>
 
       <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:bg-zinc-900">
@@ -25,6 +43,10 @@ export default function Home() {
   "publicUrl": "/p/1f6ec038-7a4d-44d8-af6e-cf97e42402e9"
 }`}
         </pre>
+        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+          For protected snippets, visitors will need to enter the passphrase to
+          view the content.
+        </p>
       </section>
     </main>
   );
