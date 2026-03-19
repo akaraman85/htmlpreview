@@ -19,7 +19,7 @@ Copy `.env.example` to `.env.local` and set:
 - `API_WRITE_TOKEN` (optional - your shared secret for write calls, users can also generate their own tokens)
 - `GOOGLE_CLIENT_ID` (required for admin dashboard - get from [Google Cloud Console](https://console.cloud.google.com/))
 - `GOOGLE_CLIENT_SECRET` (required for admin dashboard - get from [Google Cloud Console](https://console.cloud.google.com/))
-- `AUTH_SECRET` (required for NextAuth - generate with `openssl rand -base64 32`)
+- `AUTH_SECRET` (required for NextAuth - generate with `openssl rand -base64 32` and add to Vercel environment variables)
 
 **Note:** `BLOB_READ_WRITE_TOKEN` is automatically set by Vercel when you create a Blob store in your project. No manual configuration needed!
 
