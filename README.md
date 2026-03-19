@@ -30,7 +30,10 @@ Copy `.env.example` to `.env.local` and set:
 3. Enable the Google+ API
 4. Go to "Credentials" → "Create Credentials" → "OAuth client ID"
 5. Choose "Web application"
-6. Add authorized redirect URI: `https://your-domain.com/api/auth/callback/google` (or `http://localhost:3000/api/auth/callback/google` for local dev)
+6. Add authorized redirect URIs:
+   - Production: `https://htmlpreview-phi.vercel.app/api/auth/callback/google`
+   - Local dev: `http://localhost:3000/api/auth/callback/google`
+   - **Important:** The redirect URI must match exactly, including the `/api/auth/callback/google` path
 7. Copy the Client ID and Client Secret to your environment variables
 
 ## Local development
