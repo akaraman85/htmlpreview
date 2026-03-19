@@ -2,13 +2,14 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { isWriteAuthorized } from "@/lib/auth";
 import { hashPassphrase } from "@/lib/passphrase";
-import { saveSnippet } from "@/lib/store";
+import { getSnippet, saveSnippet } from "@/lib/store";
 import type { HtmlSnippet } from "@/lib/types";
 
 type CreateSnippetBody = {
   html?: unknown;
   title?: unknown;
   passphrase?: unknown;
+  id?: unknown;
 };
 
 export async function POST(request: Request) {
@@ -44,14 +45,33 @@ export async function POST(request: Request) {
     ? hashPassphrase(rawPassphrase)
     : undefined;
 
-  const id = randomUUID();
+  // Use provided ID or generate a new one
+  let id: string;
+  let existingSnippet: HtmlSnippet | null = null;
+  
+  if (typeof body.id === "string" && body.id.trim() !== "") {
+    id = body.id.trim();
+    // Check if snippet with this ID already exists
+    try {
+      existingSnippet = await getSnippet(id);
+    } catch {
+      // If getSnippet fails, we'll still try to create/update
+      existingSnippet = null;
+    }
+  } else {
+    id = randomUUID();
+  }
+
+  // If updating existing snippet, preserve original createdAt, otherwise set new one
+  const createdAt = existingSnippet?.createdAt || new Date().toISOString();
+
   const snippet: HtmlSnippet = {
     id,
     html: body.html,
     title,
     passphraseHash,
     createdBy: "api",
-    createdAt: new Date().toISOString(),
+    createdAt,
   };
 
   try {
