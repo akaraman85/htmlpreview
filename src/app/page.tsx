@@ -1,9 +1,9 @@
 export default function Home() {
-  // Get the base URL from Vercel environment or use localhost for development
+  // Use the production URL, fallback to localhost for development
   const baseUrl =
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    process.env.NODE_ENV === "production"
+      ? "https://htmlpreview-phi.vercel.app"
+      : "http://localhost:3000";
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10 md:px-8">
