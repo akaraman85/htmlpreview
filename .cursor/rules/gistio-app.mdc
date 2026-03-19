@@ -1,0 +1,73 @@
+---
+description: gistio app architecture and Vercel deployment context
+alwaysApply: true
+---
+
+# gistio - HTML Snippet Hosting Service
+
+## Overview
+
+`gistio` is a Vercel-deployed Next.js application that provides an authenticated API for storing HTML snippets and serving them on public URLs. Think of it as a pastebin/Gist service specifically for HTML content.
+
+## Deployment
+
+- **Platform**: Vercel
+- **Framework**: Next.js 16.2.0 (App Router)
+- **Storage**: Upstash Redis (serverless Redis via REST API)
+
+## Core Functionality
+
+### Write Operations
+- `POST /api/snippets` - Create snippets (requires `API_WRITE_TOKEN`)
+- Accepts: `title` (optional), `html` (required), `passphrase` (optional)
+- Returns: `{ id, apiUrl, publicUrl }`
+
+### Read Operations
+- `GET /api/snippets/:id` - Fetch snippet JSON (public, but requires passphrase if protected)
+- `GET /p/:id` - View snippet in browser (server-rendered page with iframe)
+
+### Security
+- Write auth: Bearer token (`API_WRITE_TOKEN` env var)
+- Per-snippet protection: Optional passphrase hashed with PBKDF2
+- HTML rendering: Sandboxed iframes for isolation
+
+## Key Files
+
+- `src/lib/auth.ts` - Bearer token authentication
+- `src/lib/passphrase.ts` - PBKDF2 passphrase hashing/verification
+- `src/lib/store.ts` - Upstash Redis storage operations
+- `src/lib/types.ts` - TypeScript types for snippets
+- `src/app/api/snippets/route.ts` - POST endpoint for creating snippets
+- `src/app/api/snippets/[id]/route.ts` - GET endpoint for fetching snippets
+- `src/app/p/[id]/page.tsx` - Public view page with passphrase form
+
+## Environment Variables
+
+Required for deployment:
+- `API_WRITE_TOKEN` - Secret token for write authentication
+- `UPSTASH_REDIS_REST_URL` - Upstash Redis REST API endpoint
+- `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis authentication token
+
+## Storage Schema
+
+Snippets stored in Redis with key pattern: `snippet:<uuid>`
+
+Data structure:
+```typescript
+{
+  id: string;
+  html: string;
+  title?: string;
+  passphraseHash?: string; // PBKDF2 hash (salt:hash format)
+  createdAt: string;
+  createdBy: string;
+}
+```
+
+## When Making Changes
+
+- Always check Vercel deployment requirements
+- Ensure environment variables are set in Vercel dashboard
+- Test Redis connectivity (Upstash REST API)
+- Remember: passphrases are one-way hashed - cannot be recovered
+- HTML is rendered in sandboxed iframes - scripts are isolated
