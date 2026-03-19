@@ -17,7 +17,7 @@ export async function saveSnippet(snippet: HtmlSnippet): Promise<void> {
 
   try {
     await put(pathname, jsonData, {
-      access: "public",
+      access: "private",
       contentType: "application/json",
       addRandomSuffix: false,
       token,
