@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { verifyPassphrase } from "@/lib/passphrase";
 import { getSnippet } from "@/lib/store";
 import { PassphraseForm } from "./PassphraseForm";
+import { PreviewContainer } from "./PreviewContainer";
 
 type Params = {
   params: Promise<{ id: string }>;
@@ -86,14 +87,7 @@ export default async function PublicSnippetPage({
         </p>
       </header>
 
-      <section className="flex-1 overflow-hidden">
-        <iframe
-          title={snippet.title ?? `snippet-${snippet.id}`}
-          srcDoc={snippet.html}
-          className="h-full w-full"
-          sandbox=""
-        />
-      </section>
+      <PreviewContainer html={snippet.html} title={snippet.title ?? `snippet-${snippet.id}`} />
     </main>
   );
 }
