@@ -171,13 +171,6 @@ export async function getUserSnippets(userId: string): Promise<HtmlSnippet[]> {
   }
 
   try {
-    // First, get all tokens for this user (including inactive ones)
-    const userTokens = await getUserTokens(userId, true);
-    const tokenSet = new Set(userTokens.map(t => t.token));
-    
-    // Also check by userId directly (for backward compatibility)
-    const userIdSet = new Set([userId]);
-    
     const prefix = "snippets/";
     const { blobs } = await list({ prefix, token: blobToken });
     
@@ -212,9 +205,8 @@ export async function getUserSnippets(userId: string): Promise<HtmlSnippet[]> {
         const jsonData = new TextDecoder().decode(combined);
         const snippet = JSON.parse(jsonData) as HtmlSnippet;
         
-        // Filter by user ID or by token used to create
-        if (userIdSet.has(snippet.createdBy) || 
-            (snippet.createdWithToken && tokenSet.has(snippet.createdWithToken))) {
+        // Filter by user ID - snippets are stored with token's userId in createdBy
+        if (snippet.createdBy === userId) {
           snippets.push(snippet);
         }
       } catch (error) {

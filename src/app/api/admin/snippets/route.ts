@@ -10,8 +10,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Use email as user identifier if id is not available
-  const userId = (session.user as { id?: string }).id || session.user.email;
+  // Use email as the consistent user identifier (same as token creation)
+  const userId = session.user.email || (session.user as { id?: string }).id;
   
   if (!userId) {
     return NextResponse.json({ error: "User identifier not found" }, { status: 401 });
@@ -38,8 +38,8 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Use email as user identifier if id is not available
-  const userId = (session.user as { id?: string }).id || session.user.email;
+  // Use email as the consistent user identifier (same as token creation)
+  const userId = session.user.email || (session.user as { id?: string }).id;
   
   if (!userId) {
     return NextResponse.json({ error: "User identifier not found" }, { status: 401 });
