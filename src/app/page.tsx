@@ -1,4 +1,11 @@
+"use client";
+
+import { useState } from "react";
+import { AgenticFriendlyModal } from "./AgenticFriendlyModal";
+
 export default function Home() {
+  const [showModal, setShowModal] = useState(false);
+  
   // Use the production URL, fallback to localhost for development
   const baseUrl =
     process.env.NODE_ENV === "production"
@@ -49,9 +56,17 @@ export default function Home() {
 
       {/* API Examples */}
       <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="mb-4 flex items-center gap-2">
-          <span className="text-xl">💻</span>
-          <h2 className="text-xl font-semibold">API Usage</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">💻</span>
+            <h2 className="text-xl font-semibold">API Usage</h2>
+          </div>
+          <button
+            onClick={() => setShowModal(true)}
+            className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-medium text-white transition-all hover:from-blue-700 hover:to-purple-700 active:scale-95 dark:from-blue-500 dark:to-purple-500"
+          >
+            🤖 Agentic Friendly
+          </button>
         </div>
         <div className="space-y-4">
           <div>
@@ -132,6 +147,14 @@ export default function Home() {
           no longer needed. Simple, secure, and fast! 🎉
         </p>
       </section>
+
+      {/* Agentic Friendly Modal */}
+      {showModal && (
+        <AgenticFriendlyModal
+          baseUrl={baseUrl}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </main>
   );
 }
