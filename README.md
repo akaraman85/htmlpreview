@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# gistio
 
-## Getting Started
+`gistio` is a Vercel-ready Next.js app for storing raw HTML via authenticated API calls and serving each snippet on a public URL.
 
-First, run the development server:
+## Features
+
+- Authenticated write API (`POST /api/snippets`)
+- Read API (`GET /api/snippets/:id`)
+- Public render page (`/p/:id`)
+- Redis-backed persistence via Upstash
+
+## Environment variables
+
+Copy `.env.example` to `.env.local` and set:
+
+- `API_WRITE_TOKEN` (your shared secret for write calls)
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## API usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a snippet:
 
-## Learn More
+```bash
+curl -X POST "http://localhost:3000/api/snippets" \
+  -H "Authorization: Bearer $API_WRITE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Sample","html":"<h1>Hello</h1><p>From gistio</p>"}'
+```
 
-To learn more about Next.js, take a look at the following resources:
+Success response:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```json
+{
+  "id": "1f6ec038-7a4d-44d8-af6e-cf97e42402e9",
+  "apiUrl": "/api/snippets/1f6ec038-7a4d-44d8-af6e-cf97e42402e9",
+  "publicUrl": "/p/1f6ec038-7a4d-44d8-af6e-cf97e42402e9"
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Fetch a snippet payload:
 
-## Deploy on Vercel
+```bash
+curl "http://localhost:3000/api/snippets/<id>"
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open the public page:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+open "http://localhost:3000/p/<id>"
+```
