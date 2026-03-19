@@ -52,9 +52,15 @@ export async function POST(request: Request) {
 
   try {
     await saveSnippet(snippet);
-  } catch {
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Failed to save snippet:", errorMessage);
     return NextResponse.json(
-      { error: "Storage is not configured on this deployment" },
+      {
+        error: "Storage is not configured on this deployment",
+        details: process.env.NODE_ENV === "development" ? errorMessage : undefined,
+      },
       { status: 500 },
     );
   }
