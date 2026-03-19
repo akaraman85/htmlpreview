@@ -1,4 +1,4 @@
-import { put, head } from "@vercel/blob";
+import { put, get } from "@vercel/blob";
 import type { HtmlSnippet } from "@/lib/types";
 
 const pathnameForSnippet = (id: string) => `snippets/${id}.json`;
@@ -40,18 +40,18 @@ export async function getSnippet(id: string): Promise<HtmlSnippet | null> {
   const pathname = pathnameForSnippet(id);
 
   try {
-    const blobHead = await head(pathname, { token });
-    if (!blobHead) {
+    // Use get() method for private blobs - it handles authentication automatically
+    const blob = await get(pathname, { 
+      access: "private",
+      token,
+    });
+    
+    if (!blob) {
       return null;
     }
 
-    // Fetch the blob content
-    const response = await fetch(blobHead.url);
-    if (!response.ok) {
-      return null;
-    }
-
-    const jsonData = await response.text();
+    // Read the blob content as text
+    const jsonData = await blob.text();
     return JSON.parse(jsonData) as HtmlSnippet;
   } catch (error) {
     console.error("Error fetching snippet:", error);
