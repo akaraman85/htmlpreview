@@ -1,19 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { ViewportSelector } from "./ViewportSelector";
 
 type PreviewContainerProps = {
   html: string;
   title: string;
-  /** When true, header chrome is collapsed — give iframe more vertical room */
+  /** When true, viewport toolbar is hidden (header already collapsed) — iframe gets more room */
   compactChrome?: boolean;
+  /** Rendered on the right side of the viewport toolbar (e.g. collapse chrome) */
+  viewportToolbarEnd?: ReactNode;
 };
 
 export function PreviewContainer({
   html,
   title,
   compactChrome = false,
+  viewportToolbarEnd,
 }: PreviewContainerProps) {
   const [viewportWidth, setViewportWidth] = useState<number>(0);
   const [viewportHeight, setViewportHeight] = useState<number>(0);
@@ -24,7 +27,7 @@ export function PreviewContainer({
   };
 
   // If width/height are 0, use full viewport
-  const chromeReserve = compactChrome ? 120 : 200;
+  const chromeReserve = compactChrome ? 48 : 200;
 
   const iframeStyle =
     viewportWidth > 0 && viewportHeight > 0
@@ -43,7 +46,12 @@ export function PreviewContainer({
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <ViewportSelector onSizeChange={handleSizeChange} />
+      {!compactChrome && (
+        <ViewportSelector
+          onSizeChange={handleSizeChange}
+          trailingActions={viewportToolbarEnd}
+        />
+      )}
       <section
         className="flex-1 overflow-auto"
         style={{

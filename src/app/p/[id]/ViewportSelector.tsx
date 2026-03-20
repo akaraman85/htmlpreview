@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 type ViewportSize = {
   name: string;
@@ -17,9 +17,14 @@ const viewportSizes: ViewportSize[] = [
 
 type ViewportSelectorProps = {
   onSizeChange: (width: number, height: number) => void;
+  /** e.g. collapse control for the whole header + toolbar chrome */
+  trailingActions?: ReactNode;
 };
 
-export function ViewportSelector({ onSizeChange }: ViewportSelectorProps) {
+export function ViewportSelector({
+  onSizeChange,
+  trailingActions,
+}: ViewportSelectorProps) {
   const [selectedSize, setSelectedSize] = useState<ViewportSize | null>(null);
 
   const handleSizeSelect = (size: ViewportSize) => {
@@ -34,7 +39,7 @@ export function ViewportSelector({ onSizeChange }: ViewportSelectorProps) {
 
   return (
     <div
-      className="flex items-center gap-2 border-b px-4 py-2"
+      className="flex w-full flex-wrap items-center gap-2 border-b px-4 py-2 md:px-6"
       style={{
         borderColor: "#E3EAF2",
         backgroundColor: "#F7F9FB",
@@ -46,7 +51,7 @@ export function ViewportSelector({ onSizeChange }: ViewportSelectorProps) {
       >
         Viewport:
       </span>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {viewportSizes.map((size) => (
           <button
             key={size.name}
@@ -102,13 +107,15 @@ export function ViewportSelector({ onSizeChange }: ViewportSelectorProps) {
           Fullscreen
         </button>
       </div>
-      {selectedSize && (
-        <span
-          className="ml-auto text-xs"
-          style={{ color: "#6C7A89" }}
-        >
-          {selectedSize.width} × {selectedSize.height}
-        </span>
+      {(selectedSize || trailingActions) && (
+        <div className="ml-auto flex shrink-0 items-center gap-3">
+          {selectedSize && (
+            <span className="text-xs" style={{ color: "#6C7A89" }}>
+              {selectedSize.width} × {selectedSize.height}
+            </span>
+          )}
+          {trailingActions}
+        </div>
       )}
     </div>
   );

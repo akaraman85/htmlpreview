@@ -54,8 +54,8 @@ export function PreviewPageShell({
             onClick={toggleCollapsed}
             className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
             aria-expanded={false}
-            aria-label="Expand preview header"
-            title="Show title and viewport controls"
+            aria-label="Expand header and viewport toolbar"
+            title="Show title bar and viewport controls"
           >
             <ChevronDownIcon className="h-4 w-4" />
           </button>
@@ -71,21 +71,26 @@ export function PreviewPageShell({
                 Created at {new Date(createdAt).toLocaleString()}
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-3">
+            <div className="flex shrink-0 items-center">
               <HeaderLink />
+            </div>
+          </header>
+          <PreviewContainer
+            html={html}
+            title={iframeTitle}
+            viewportToolbarEnd={
               <button
                 type="button"
                 onClick={toggleCollapsed}
                 className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
                 aria-expanded={true}
-                aria-label="Collapse preview header"
-                title="Hide title and viewport controls"
+                aria-label="Collapse header and viewport toolbar"
+                title="Hide title bar and viewport controls"
               >
                 <ChevronUpIcon className="h-4 w-4" />
               </button>
-            </div>
-          </header>
-          <PreviewContainer html={html} title={iframeTitle} />
+            }
+          />
         </>
       )}
 
