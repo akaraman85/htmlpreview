@@ -23,7 +23,7 @@ Copy `.env.example` to `.env.local` and set:
 
 **Note:** `BLOB_READ_WRITE_TOKEN` is automatically set by Vercel when you create a Blob store in your project. No manual configuration needed!
 
-**Optional:** `NEXT_PUBLIC_SITE_URL` — canonical origin (e.g. `https://your-domain.com`) for `/sitemap.xml`, `/robots.txt`, and Open Graph absolute URLs. If unset, `VERCEL_URL` or the default production host is used.
+**Recommended on Vercel:** `NEXT_PUBLIC_SITE_URL` — set to your real public origin (e.g. `https://htmlpreview-phi.vercel.app`). Without it, preview pages still use the **request host** for `og:image` / `og:url` (so Slack matches the link you paste). This env is still used as a fallback for sitemap/robots during static generation and for `VERCEL_PROJECT_PRODUCTION_URL` when available.
 
 ## Getting a write token (before you upload)
 

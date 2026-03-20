@@ -1,12 +1,20 @@
 import type { MetadataRoute } from "next";
 import { listPublicSnippetsForSitemap } from "@/lib/store";
-import { getSiteUrl } from "@/lib/site-url";
+import {
+  getCanonicalSiteUrlFromRequest,
+  getSiteUrl,
+} from "@/lib/site-url";
 
 /** Regenerate periodically so new public previews appear without hammering Blob on every request. */
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = getSiteUrl();
+  let base: string;
+  try {
+    base = await getCanonicalSiteUrlFromRequest();
+  } catch {
+    base = getSiteUrl();
+  }
   const now = new Date();
 
   const staticEntries: MetadataRoute.Sitemap = [
