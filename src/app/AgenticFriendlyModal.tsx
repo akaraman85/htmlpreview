@@ -21,10 +21,46 @@ HTMLPreview is a Vercel-deployed Next.js application that provides an authentica
 ## Base URL
 ${baseUrl}
 
-## Authentication
-All write operations (POST, DELETE) require authentication using a Bearer token:
-- Header: \`Authorization: Bearer <API_WRITE_TOKEN>\`
-- The API_WRITE_TOKEN is a shared secret configured in the Vercel environment
+## Authentication (get a token before uploading)
+All write operations (POST, DELETE) require a Bearer token in the header:
+\`Authorization: Bearer <YOUR_WRITE_TOKEN>\`
+
+**Two ways to obtain \`<YOUR_WRITE_TOKEN>\`:**
+
+1. **Per-user token (recommended)** — Human signs in at \`${baseUrl}/admin\` with Google → **Generate API Token** → copy the hex token. Use it in the Authorization header. Tokens are tied to that account; you can list and inactivate them in the admin dashboard.
+
+2. **Deployment secret** — If the project owner set \`API_WRITE_TOKEN\` in Vercel environment variables, that same string is accepted as the Bearer token (shared across all callers who know it).
+
+You must have a valid token **before** calling \`POST /api/snippets\`; otherwise the API returns \`401 Unauthorized\`.
+
+In examples below, replace \`\$API_WRITE_TOKEN\` or \`<API_WRITE_TOKEN>\` with either your admin-generated token or the deployment secret.
+
+## Authentication errors (401) — \`authStatus\` field
+When a write request is rejected, the JSON body includes machine-readable \`authStatus\` plus human and agent-oriented text. Always inspect \`authStatus\` before retrying.
+
+| \`authStatus\` | Meaning | What to do |
+|----------------|---------|------------|
+| \`missing_authorization\` | No \`Authorization\` header, wrong scheme, or not \`Bearer\`. | Add \`Authorization: Bearer <your-token>\`. |
+| \`empty_token\` | Header present but token string is blank. | Paste the full token after \`Bearer \` with no typos. |
+| \`invalid_token\` | Token does not match this deployment (wrong value, typo, or unknown token). | Regenerate at \`${baseUrl}/admin\` or verify \`API_WRITE_TOKEN\` matches the server. |
+| \`token_revoked\` | This was a valid **user** token that was **revoked/deactivated** in the admin dashboard. | **Generate a new token** at \`${baseUrl}/admin\`; revoked tokens never work again for writes. |
+
+**Response shape (401):**
+\`\`\`json
+{
+  "error": "Unauthorized",
+  "authStatus": "token_revoked",
+  "message": "This API token was revoked or deactivated...",
+  "agentHint": "Sign in at /admin, generate a new API token...",
+  "documentation": "${baseUrl}/article/secure-html-preview-api"
+}
+\`\`\`
+
+- \`message\` — short summary for logs or UI.
+- \`agentHint\` — step-by-step guidance for automated clients.
+- \`documentation\` — link to the human guide (getting a token, etc.).
+
+**Note:** \`invalid_token\` is used when the server cannot match the credential (including wrong deployment secret). \`token_revoked\` is only returned when the token **was** a known user token that has been inactivated — so agents can branch: revoked → new token at admin; invalid → check spelling and deployment.
 
 ## Endpoints
 
@@ -106,14 +142,15 @@ Snippets can be viewed at: \`/p/<id>\` or \`/p/<id>?passphrase=xxx\`
 The passphrase is automatically included in the publicUrl when creating protected snippets.
 
 ## Important Notes for AI Agents
-1. Always use the Authorization header with Bearer token for write operations
-2. HTML content must be a non-empty string
-3. Passphrases are hashed with PBKDF2 and cannot be recovered
-4. If updating a snippet, provide the existing ID in the request body
-5. Protected snippets require passphrase in URL query parameter for access
-6. The publicUrl returned includes the passphrase automatically if one was set
-7. All snippets are stored in Vercel Blob with private access
-8. Snippets are rendered in sandboxed iframes for security
+1. On \`401\` from POST or DELETE, read \`authStatus\` in the JSON body and follow \`agentHint\`; use \`token_revoked\` vs \`invalid_token\` to decide whether to obtain a **new** admin token or fix configuration/spelling
+2. Always use the Authorization header with Bearer token for write operations
+3. HTML content must be a non-empty string
+4. Passphrases are hashed with PBKDF2 and cannot be recovered
+5. If updating a snippet, provide the existing ID in the request body
+6. Protected snippets require passphrase in URL query parameter for access
+7. The publicUrl returned includes the passphrase automatically if one was set
+8. All snippets are stored in Vercel Blob with private access
+9. Snippets are rendered in sandboxed iframes for security
 
 ## Example Usage
 \`\`\`bash

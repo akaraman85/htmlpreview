@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { getAuthUser } from "@/lib/auth";
+import { resolveWriteAuth, writeAuthErrorBody } from "@/lib/auth";
 import { hashPassphrase } from "@/lib/passphrase";
 import { getSnippet, saveSnippet } from "@/lib/store";
 import type { HtmlSnippet } from "@/lib/types";
@@ -13,10 +13,14 @@ type CreateSnippetBody = {
 };
 
 export async function POST(request: Request) {
-  const authUser = await getAuthUser(request.headers.get("authorization"));
-  if (!authUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const authResult = await resolveWriteAuth(request.headers.get("authorization"));
+  if (!authResult.ok) {
+    const origin = new URL(request.url).origin;
+    return NextResponse.json(writeAuthErrorBody(authResult, origin), {
+      status: 401,
+    });
   }
+  const authUser = authResult;
 
   let body: CreateSnippetBody;
   try {

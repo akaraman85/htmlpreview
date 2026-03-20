@@ -6,9 +6,15 @@ import { ViewportSelector } from "./ViewportSelector";
 type PreviewContainerProps = {
   html: string;
   title: string;
+  /** When true, header chrome is collapsed — give iframe more vertical room */
+  compactChrome?: boolean;
 };
 
-export function PreviewContainer({ html, title }: PreviewContainerProps) {
+export function PreviewContainer({
+  html,
+  title,
+  compactChrome = false,
+}: PreviewContainerProps) {
   const [viewportWidth, setViewportWidth] = useState<number>(0);
   const [viewportHeight, setViewportHeight] = useState<number>(0);
 
@@ -18,13 +24,15 @@ export function PreviewContainer({ html, title }: PreviewContainerProps) {
   };
 
   // If width/height are 0, use full viewport
+  const chromeReserve = compactChrome ? 120 : 200;
+
   const iframeStyle =
     viewportWidth > 0 && viewportHeight > 0
       ? {
           width: `${viewportWidth}px`,
           height: `${viewportHeight}px`,
           maxWidth: "100%",
-          maxHeight: "calc(100vh - 200px)",
+          maxHeight: `calc(100vh - ${chromeReserve}px)`,
           margin: "auto",
           display: "block",
         }

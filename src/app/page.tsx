@@ -207,6 +207,29 @@ export default function Home() {
             🤖 Agentic Friendly
           </button>
         </div>
+        <p
+          className="mb-4 rounded-lg border p-4 text-sm leading-relaxed"
+          style={{
+            borderColor: "#E3EAF2",
+            backgroundColor: "#F7F9FB",
+            color: "#6C7A89",
+          }}
+        >
+          <strong style={{ color: "#1C2541" }}>Before you upload:</strong> you need a
+          write token. Sign in at{" "}
+          <Link href="/admin" className="font-medium underline" style={{ color: "#3A506B" }}>
+            Admin
+          </Link>{" "}
+          with Google and generate an API token, or use the deployment{" "}
+          <code className="rounded bg-white px-1 py-0.5 text-xs text-[#1C2541]">
+            API_WRITE_TOKEN
+          </code>{" "}
+          if your project is configured with one. Use it as{" "}
+          <code className="rounded bg-white px-1 py-0.5 text-xs text-[#1C2541]">
+            Authorization: Bearer &lt;token&gt;
+          </code>
+          .
+        </p>
         <div className="space-y-4">
           <div>
             <div className="mb-2 flex items-center gap-2">

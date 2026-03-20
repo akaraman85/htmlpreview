@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 import { verifyPassphrase } from "@/lib/passphrase";
 import { getSnippet } from "@/lib/store";
-import { HeaderLink } from "./HeaderLink";
 import { PassphraseForm } from "./PassphraseForm";
-import { PreviewContainer } from "./PreviewContainer";
+import { PreviewPageShell } from "./PreviewPageShell";
 
 type Params = {
   params: Promise<{ id: string }>;
@@ -78,20 +77,11 @@ export default async function PublicSnippetPage({
   }
 
   return (
-    <main className="flex h-screen w-full flex-col">
-      <header className="flex flex-shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900 md:px-6">
-        <div className="flex items-center gap-3">
-          <h1 className="text-lg font-semibold">
-            {snippet.title ?? "Shared HTML Snippet"}
-          </h1>
-          <p className="text-xs text-zinc-500">
-            Created at {new Date(snippet.createdAt).toLocaleString()}
-          </p>
-        </div>
-        <HeaderLink />
-      </header>
-
-      <PreviewContainer html={snippet.html} title={snippet.title ?? `snippet-${snippet.id}`} />
-    </main>
+    <PreviewPageShell
+      snippetId={snippet.id}
+      title={snippet.title ?? "Shared HTML Snippet"}
+      createdAt={snippet.createdAt}
+      html={snippet.html}
+    />
   );
 }

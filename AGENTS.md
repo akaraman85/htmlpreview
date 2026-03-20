@@ -40,9 +40,13 @@ HTMLPreview is a Vercel-ready Next.js application for storing raw HTML snippets 
 - `GOOGLE_CLIENT_SECRET`: Required for admin dashboard - Google OAuth client secret
 - `AUTH_SECRET`: Required for NextAuth.js - generate with `openssl rand -base64 32`
 
+## Getting a token before upload
+
+Documented for humans in **README** (section “Getting a write token”) and on the **home page** (API Usage callout) and **Agentic Friendly** modal: either generate a token at `/admin` after Google sign-in, or use the deployment `API_WRITE_TOKEN`.
+
 ## Data Flow
 
-1. Client sends POST with `Authorization: Bearer <API_WRITE_TOKEN>` and optional `passphrase`
+1. Client sends POST with `Authorization: Bearer <token>` (user token from admin or `API_WRITE_TOKEN`) and optional `passphrase`
 2. Server validates token, hashes passphrase (if provided), generates UUID
 3. Snippet stored in Vercel Blob as JSON at pathname `snippets/<id>.json`
 4. Returns `{ id, apiUrl, publicUrl }`
@@ -75,9 +79,11 @@ HTMLPreview is a Vercel-ready Next.js application for storing raw HTML snippets 
 - **Snippet Tracking**: Each snippet stores `createdWithToken` field to track which token was used to create it
 - **Querying by Token**: Use `GET /api/admin/tokens/[token]/snippets` to query all snippets created with a specific token (works even if token is inactive)
 - **Authentication Functions**:
+  - `resolveWriteAuth()` - Resolves Bearer auth for writes; returns `authStatus` on failure (`missing_authorization`, `empty_token`, `invalid_token`, `token_revoked`)
+  - `writeAuthErrorBody()` - Builds JSON for `401` responses (`error`, `authStatus`, `message`, `agentHint`, `documentation`)
   - `validateUserToken()` - Returns token if found (including inactive ones, for query purposes)
-  - `validateTokenForAuth()` - Only accepts active tokens (for authentication)
-  - `isWriteAuthorized()` - Uses `validateTokenForAuth()` to reject inactive tokens
+  - `validateTokenForAuth()` - Deprecated; delegates to `resolveWriteAuth`
+  - `isWriteAuthorized()` - Uses `resolveWriteAuth()` for boolean check
 
 ## Important Notes
 

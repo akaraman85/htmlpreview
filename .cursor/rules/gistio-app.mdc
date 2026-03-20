@@ -111,9 +111,9 @@ Token structure:
 ## Token Authentication & Validation
 
 - **Authentication Flow**: 
-  - `isWriteAuthorized()` uses `validateTokenForAuth()` which only accepts active tokens
-  - `validateTokenForAuth()` checks global `API_WRITE_TOKEN` first, then user tokens
-  - User tokens must not have `deletedAt` set to be valid for authentication
+  - `POST /api/snippets` and `DELETE /api/snippets/:id` use `resolveWriteAuth()`; failures return `401` with `authStatus`: `missing_authorization` | `empty_token` | `invalid_token` | `token_revoked`, plus `message`, `agentHint`, `documentation`
+  - `isWriteAuthorized()` uses `resolveWriteAuth()` for a boolean check
+  - Global `API_WRITE_TOKEN` is checked first, then user tokens (active only; revoked returns `token_revoked`)
 - **Token Querying**:
   - `validateUserToken()` returns tokens even if inactive (for query/audit purposes)
   - `getSnippetsByToken()` can query snippets by any token (active or inactive)

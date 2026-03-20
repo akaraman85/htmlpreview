@@ -23,6 +23,21 @@ Copy `.env.example` to `.env.local` and set:
 
 **Note:** `BLOB_READ_WRITE_TOKEN` is automatically set by Vercel when you create a Blob store in your project. No manual configuration needed!
 
+## Getting a write token (before you upload)
+
+Every `POST` / `DELETE` to the snippets API needs a Bearer token. You can use either:
+
+1. **Your own API token (recommended for individuals)**  
+   - Open **`/admin`** in the browser, sign in with Google, then use **Generate API Token**.  
+   - Copy the token once; use it as `Authorization: Bearer <that-token>` in curl or your app.  
+   - You can create multiple tokens and revoke (inactivate) them from the same dashboard.
+
+2. **Deployment `API_WRITE_TOKEN` (for automation / shared projects)**  
+   - Set a long random secret in Vercel env as `API_WRITE_TOKEN`.  
+   - Use that same value in the `Authorization: Bearer ...` header.
+
+Generate or configure a token **before** calling `POST /api/snippets`; the API will return `401 Unauthorized` without a valid token.
+
 ### Setting up Google OAuth
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
@@ -46,6 +61,17 @@ npm run dev
 Then open [http://localhost:3000](http://localhost:3000).
 
 ## API usage
+
+### Write errors (`401 Unauthorized`)
+
+Failed authentication on `POST` or `DELETE /api/snippets` returns JSON with:
+
+- `authStatus` — `missing_authorization` | `empty_token` | `invalid_token` | `token_revoked`
+- `message` — short explanation
+- `agentHint` — guidance for tools and automation
+- `documentation` — link to the how-it-works article
+
+Use `token_revoked` when a user API token was deactivated in **Admin** (generate a new token). Use `invalid_token` when the credential is wrong or unknown.
 
 Create a snippet:
 
