@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { verifyPassphrase } from "@/lib/passphrase";
+import { getSiteUrl } from "@/lib/site-url";
 import { getSnippet } from "@/lib/store";
 import { PassphraseForm } from "./PassphraseForm";
 import { PreviewPageShell } from "./PreviewPageShell";
@@ -50,14 +51,17 @@ export async function generateMetadata({
     ? "This preview is passphrase-protected. Open the link to view it."
     : "View this shared HTML preview on HTMLPreview.";
 
+  const canonical = `${getSiteUrl()}/p/${id}`;
+
   return {
     title,
     description,
+    metadataBase: new URL(getSiteUrl()),
     openGraph: {
       title,
       description,
       type: "website",
-      url: `/p/${id}`,
+      url: canonical,
     },
     twitter: {
       card: "summary_large_image",

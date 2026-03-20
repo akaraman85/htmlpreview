@@ -14,6 +14,24 @@ function truncateTitle(title: string, max = 72): string {
   return `${t.slice(0, max - 1)}…`;
 }
 
+/** Rough plain-text excerpt for OG art (not a pixel-perfect HTML screenshot). */
+function plainTextExcerptFromHtml(html: string, maxLen = 220): string {
+  const noScripts = html
+    .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[\s\S]*?<\/style>/gi, " ");
+  const text = noScripts
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length <= maxLen) return text;
+  return `${text.slice(0, maxLen - 1)}…`;
+}
+
 async function loadInterFonts(): Promise<{
   bold: ArrayBuffer;
   regular: ArrayBuffer;
@@ -125,6 +143,7 @@ export default async function OpengraphImage({
   }
 
   const title = truncateTitle(snippet.title?.trim() || "Shared HTML snippet");
+  const excerpt = truncateTitle(plainTextExcerptFromHtml(snippet.html), 200);
 
   return new ImageResponse(
     (
@@ -172,8 +191,22 @@ export default async function OpengraphImage({
           >
             {title}
           </div>
-          <div style={{ fontSize: 26, fontWeight: 400, color: "#94a3b8" }}>
-            Open this preview on HTMLPreview
+          {excerpt ? (
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 400,
+                color: "#cbd5e1",
+                lineHeight: 1.35,
+                maxHeight: 200,
+                overflow: "hidden",
+              }}
+            >
+              {excerpt}
+            </div>
+          ) : null}
+          <div style={{ fontSize: 22, fontWeight: 400, color: "#94a3b8" }}>
+            Open the link for the full rendered HTML preview
           </div>
         </div>
       </div>
