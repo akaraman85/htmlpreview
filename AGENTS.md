@@ -30,6 +30,7 @@ HTMLPreview is a Vercel-ready Next.js application for storing raw HTML snippets 
 4. **Passphrase Protection**: Optional per-snippet passphrase hashed with PBKDF2
 5. **Admin Dashboard** (`/admin`): Google OAuth-protected dashboard for managing API tokens
 6. **User-Generated Tokens**: Users can generate their own API tokens via the admin dashboard
+7. **SEO article** (`/article/secure-html-preview-api`): Step-by-step guide for secure HTML preview hosting, AI/agent use case, metadata + JSON-LD
 
 ## Environment Variables
 

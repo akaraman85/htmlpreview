@@ -25,7 +25,22 @@ export default function Home() {
             HTMLPreview
           </h1>
         </div>
-        <nav>
+        <nav className="flex items-center gap-1">
+          <Link
+            href="/article/secure-html-preview-api"
+            className="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            style={{
+              color: "#6C7A89",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#3A506B";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#6C7A89";
+            }}
+          >
+            How it works
+          </Link>
           <Link
             href="/admin"
             className="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
