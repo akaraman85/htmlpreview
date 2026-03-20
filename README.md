@@ -40,6 +40,47 @@ Every `POST` / `DELETE` to the snippets API needs a Bearer token. You can use ei
 
 Generate or configure a token **before** calling `POST /api/snippets`; the API will return `401 Unauthorized` without a valid token.
 
+## End-to-end tests (Playwright)
+
+```bash
+npx playwright install chromium   # once per machine
+npm run test:e2e                  # builds, starts production server, runs tests
+```
+
+- **`e2e/public-routes.spec.ts`** — always runs: home page, `robots.txt`, `sitemap.xml` (and asserts no `Set-Cookie` on those SEO routes).
+- **`e2e/preview-open-graph.spec.ts`** — full stack: `POST /api/snippets`, open `/p/:id`, assert `og:image` / `og:url` use the same host as the server, fetch `og:image` as Slackbot and assert PNG + no cookies. **Skipped** unless both `BLOB_READ_WRITE_TOKEN` and `API_WRITE_TOKEN` (or `E2E_WRITE_TOKEN`) are set (e.g. in `.env.local` when Playwright starts `next start`).
+
+Use `npm run test:e2e:ui` for the Playwright UI.
+
+### Running E2E against Vercel (or any deployed URL)
+
+Vercel **does not run Playwright** on its platform (no long-lived browser runner in the build). The usual pattern is:
+
+1. **Deploy** to Vercel (preview or production).
+2. **Run Playwright in GitHub Actions** (or another CI) and point tests at the live URL.
+
+If `PLAYWRIGHT_BASE_URL` is **not** `localhost` / `127.0.0.1`, this repo’s config **skips** the local `webServer` and only hits the remote app:
+
+```bash
+export PLAYWRIGHT_BASE_URL="https://htmlpreview-phi.vercel.app"
+# Optional: force skip even on localhost (e.g. you already ran `npm run start`)
+# export PLAYWRIGHT_SKIP_WEBSERVER=1
+
+export BLOB_READ_WRITE_TOKEN="…"   # same store the deployment uses
+export API_WRITE_TOKEN="…"         # or E2E_WRITE_TOKEN
+
+npx playwright install chromium
+npx playwright test
+```
+
+`BLOB_READ_WRITE_TOKEN` and `API_WRITE_TOKEN` must be available **on the CI runner** (secrets), not inside Vercel — the snippet test calls your deployment’s **`POST /api/snippets`** over HTTPS.
+
+You can also wire **Vercel → GitHub** (e.g. [deployment events](https://vercel.com/docs/deployments/git#github) or a workflow that reads the preview URL from the Vercel bot comment) and pass that URL as `PLAYWRIGHT_BASE_URL`. See `.github/workflows/e2e-vercel.yml` for a **manual** “run E2E against this URL” workflow.
+
+### GitHub Actions
+
+`.github/workflows/e2e.yml` runs on push/PR: public tests always; the OG/snippet test runs when repo secrets `BLOB_READ_WRITE_TOKEN` and `API_WRITE_TOKEN` are configured.
+
 ### Setting up Google OAuth
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)

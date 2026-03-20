@@ -1,0 +1,42 @@
+# Run Playwright against a live deployment (e.g. after Vercel finishes).
+# Vercel does not execute Playwright; this job runs on GitHub's runners.
+name: E2E (deployed URL)
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Full origin, e.g. https://htmlpreview-phi.vercel.app or a preview URL"
+        required: true
+        type: string
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Playwright against deployment
+        env:
+          CI: "true"
+          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.base_url }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          API_WRITE_TOKEN: ${{ secrets.API_WRITE_TOKEN }}
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-vercel
+          path: playwright-report/
+          retention-days: 7
