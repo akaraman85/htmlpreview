@@ -481,3 +481,47 @@ export async function deleteUserToken(userId: string, token: string): Promise<vo
     throw new Error(`Failed to delete user token: ${errorMessage}`);
   }
 }
+
+/** Public preview pages only (no passphrase); for sitemap / SEO. Paginates blob list. */
+export async function listPublicSnippetsForSitemap(): Promise<
+  { id: string; lastModified: Date }[]
+> {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!blobToken) {
+    return [];
+  }
+
+  const results: { id: string; lastModified: Date }[] = [];
+  let cursor: string | undefined;
+
+  try {
+    do {
+      const response = await list({
+        prefix: "snippets/",
+        token: blobToken,
+        limit: 1000,
+        cursor,
+      });
+
+      for (const blob of response.blobs) {
+        const match = /^snippets\/([^/]+)\.json$/.exec(blob.pathname);
+        if (!match) continue;
+        const id = match[1];
+        const snippet = await getSnippet(id);
+        if (!snippet || snippet.passphraseHash) continue;
+        results.push({
+          id: snippet.id,
+          lastModified: new Date(snippet.createdAt),
+        });
+      }
+
+      cursor =
+        response.hasMore && response.cursor ? response.cursor : undefined;
+    } while (cursor);
+  } catch (error) {
+    console.error("listPublicSnippetsForSitemap:", error);
+    return [];
+  }
+
+  return results;
+}

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { verifyPassphrase } from "@/lib/passphrase";
 import { getSnippet } from "@/lib/store";
@@ -8,6 +9,63 @@ type Params = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ passphrase?: string }>;
 };
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: Params): Promise<Metadata> {
+  const { id } = await params;
+  const { passphrase } = await searchParams;
+
+  let snippet: Awaited<ReturnType<typeof getSnippet>> = null;
+  try {
+    snippet = await getSnippet(id);
+  } catch {
+    return {
+      title: "HTMLPreview",
+      description:
+        "Store HTML snippets via API and share them instantly with public URLs.",
+    };
+  }
+
+  if (!snippet) {
+    return { title: "Not found — HTMLPreview" };
+  }
+
+  const needsPassphrase = Boolean(snippet.passphraseHash);
+  const unlocked =
+    !needsPassphrase ||
+    Boolean(
+      passphrase &&
+        snippet.passphraseHash &&
+        verifyPassphrase(passphrase, snippet.passphraseHash),
+    );
+  const locked = needsPassphrase && !unlocked;
+
+  const title = locked
+    ? "Protected snippet — HTMLPreview"
+    : `${snippet.title?.trim() || "Shared HTML snippet"} — HTMLPreview`;
+
+  const description = locked
+    ? "This preview is passphrase-protected. Open the link to view it."
+    : "View this shared HTML preview on HTMLPreview.";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `/p/${id}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 export default async function PublicSnippetPage({
   params,

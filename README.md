@@ -23,6 +23,8 @@ Copy `.env.example` to `.env.local` and set:
 
 **Note:** `BLOB_READ_WRITE_TOKEN` is automatically set by Vercel when you create a Blob store in your project. No manual configuration needed!
 
+**Optional:** `NEXT_PUBLIC_SITE_URL` — canonical origin (e.g. `https://your-domain.com`) for `/sitemap.xml`, `/robots.txt`, and Open Graph absolute URLs. If unset, `VERCEL_URL` or the default production host is used.
+
 ## Getting a write token (before you upload)
 
 Every `POST` / `DELETE` to the snippets API needs a Bearer token. You can use either:
