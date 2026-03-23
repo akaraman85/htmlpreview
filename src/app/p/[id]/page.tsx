@@ -54,20 +54,45 @@ export async function generateMetadata({
   const origin = await getCanonicalSiteUrlFromRequest();
   const canonical = `${origin}/p/${id}`;
 
+  // Passphrase-protected snippets: the default og:image URL has no query string,
+  // so opengraph-image always renders the "locked" generic art. When the request
+  // includes a valid passphrase (e.g. Slack unfurling the full pasted URL), point
+  // og:image at the same route with ?passphrase= so the image matches the title.
+  const trimmedPass =
+    typeof passphrase === "string" ? passphrase.trim() : "";
+  const showUnlockedOgImage =
+    Boolean(snippet.passphraseHash) && !locked && trimmedPass !== "";
+  const ogImageWithPass = `/p/${id}/opengraph-image?passphrase=${encodeURIComponent(trimmedPass)}`;
+
+  const openGraph: NonNullable<Metadata["openGraph"]> = {
+    title,
+    description,
+    type: "website",
+    url: canonical,
+    ...(showUnlockedOgImage
+      ? {
+          images: [
+            {
+              url: ogImageWithPass,
+              width: 1200,
+              height: 630,
+              alt: title,
+            },
+          ],
+        }
+      : {}),
+  };
+
   return {
     title,
     description,
     metadataBase: new URL(origin),
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      url: canonical,
-    },
+    openGraph,
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      ...(showUnlockedOgImage ? { images: [ogImageWithPass] } : {}),
     },
   };
 }

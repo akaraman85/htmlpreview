@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { notFound } from "next/navigation";
+import { verifyPassphrase } from "@/lib/passphrase";
 import { getSnippet } from "@/lib/store";
 
 export const runtime = "nodejs";
@@ -69,12 +70,25 @@ const interFontOptions = (fonts: { bold: ArrayBuffer; regular: ArrayBuffer }) =>
     },
   ];
 
+function firstString(
+  value: string | string[] | undefined,
+): string | undefined {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value) && value[0]) return value[0];
+  return undefined;
+}
+
 export default async function OpengraphImage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id } = await params;
+  const sp = searchParams ? await searchParams : {};
+  const passphrase = firstString(sp.passphrase);
+
   let snippet: Awaited<ReturnType<typeof getSnippet>> = null;
   try {
     snippet = await getSnippet(id);
@@ -88,7 +102,14 @@ export default async function OpengraphImage({
   const fonts = await loadInterFonts();
   const fontOpts = interFontOptions(fonts);
 
-  if (snippet.passphraseHash) {
+  const hash = snippet.passphraseHash;
+  const passphraseUnlocked =
+    !!hash &&
+    !!passphrase &&
+    passphrase.trim() !== "" &&
+    verifyPassphrase(passphrase, hash);
+
+  if (snippet.passphraseHash && !passphraseUnlocked) {
     return new ImageResponse(
       (
         <div

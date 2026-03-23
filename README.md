@@ -47,6 +47,12 @@ npx playwright install chromium   # once per machine
 npm run test:e2e                  # builds, starts production server, runs tests
 ```
 
+If **port 3000** is already used by another app, use a free port (Playwright always starts its own server unless `PLAYWRIGHT_REUSE_SERVER=1`):
+
+```bash
+PLAYWRIGHT_PORT=3045 npm run test:e2e
+```
+
 - **`e2e/public-routes.spec.ts`** — always runs: home page, `robots.txt`, `sitemap.xml` (and asserts no `Set-Cookie` on those SEO routes).
 - **`e2e/preview-open-graph.spec.ts`** — full stack: `POST /api/snippets`, open `/p/:id`, assert `og:image` / `og:url` use the same host as the server, fetch `og:image` as Slackbot and assert PNG + no cookies. **Skipped** unless both `BLOB_READ_WRITE_TOKEN` and `API_WRITE_TOKEN` (or `E2E_WRITE_TOKEN`) are set (e.g. in `.env.local` when Playwright starts `next start`).
 
